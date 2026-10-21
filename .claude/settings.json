@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "ClaudeInChromeDomain(localhost:8765)",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "ClaudeInChromeDomain(127.0.0.1:8766)",
+      "ClaudeInChromeDomain(127.0.0.1:8767)",
+      "ClaudeInChromeDomain(127.0.0.1:8768)",
+      "mcp__claude-in-chrome__tabs_create_mcp",
+      "ClaudeInChromeDomain(127.0.0.1:8769)"
+    ]
+  }
+}

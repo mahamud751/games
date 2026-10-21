@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Padel Rush</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- top bar (menus) -->
+  <div id="topbar">
+    <div class="me"><div id="tbAvatar">A</div><div><div id="tbName">ACE</div><div class="lv"><span>LV <b id="tbLevel">1</b></span><div class="xpbar"><i id="tbXp"></i></div></div></div></div>
+    <div class="right">
+      <div class="coins">🪙 <b id="tbCoins">0</b></div>
+      <button id="sMusic" class="icon" title="Music">♪</button>
+      <button id="sSfx" class="icon" title="Sound">🔊</button>
+    </div>
+  </div>
+
+  <!-- home -->
+  <section id="home" class="screen show">
+    <div class="hero">
+      <div class="logo"><span class="a">PADEL</span><span class="b">RUSH</span></div>
+      <div class="sub">LONDON CLUB CIRCUIT</div>
+    </div>
+    <div class="tiles">
+      <button class="tile big t-tour" data-go="tour"><span class="ti">🏙️</span><b>Club Tour</b><small>Five London clubs. Beat them all.</small></button>
+      <button class="tile t-single" data-go="single"><span class="ti">🎾</span><b>Single Match</b><small>Pick a club and a level</small></button>
+      <button class="tile t-cup" data-go="cups"><span class="ti">🏆</span><b>Tournament</b><small>3 rounds to the trophy</small></button>
+      <button class="tile t-train" data-go="training"><span class="ti">🎯</span><b>Training</b><small>Hit the targets</small></button>
+      <button class="tile t-lock" data-go="locker"><span class="ti">🧢</span><b>Locker</b><small>Rackets, kits &amp; style</small></button>
+    </div>
+    <div class="settings">
+      <span>MOVEMENT ASSIST</span>
+      <div class="seg" id="assistSeg"><button data-v="off">Off</button><button data-v="light">Light</button><button data-v="full">Full auto</button></div>
+    </div>
+    <div class="controls">
+      <span><kbd>WASD</kbd> move &amp; aim</span>
+      <span><kbd>Space</kbd>/<kbd>J</kbd>/<kbd>Click</kbd> hit</span>
+      <span><kbd>Shift</kbd>/<kbd>K</kbd>/<kbd>Right-click</kbd> lob · power</span>
+      <span><kbd>P</kbd> pause</span>
+    </div>
+  </section>
+
+  <section id="tour" class="screen">
+    <div class="head"><button class="back" data-go="home">‹</button><h2>Club Tour</h2><p>Win at each club to unlock the next. Big wins earn more stars.</p></div>
+    <div id="tourCards" class="clubs"></div>
+  </section>
+
+  <section id="single" class="screen">
+    <div class="head"><button class="back" data-go="home">‹</button><h2>Single Match</h2></div>
+    <div class="card form">
+      <div class="lbl">Club</div><div id="singleClubs" class="chips"></div>
+      <div class="lbl">Rivals</div>
+      <div class="seg" id="singleSkill"><button data-v="easy">Easy</button><button data-v="medium" class="on">Medium</button><button data-v="hard">Hard</button></div>
+      <div class="lbl">Length</div>
+      <div class="seg" id="singleLen"><button data-v="2">2 games</button><button data-v="4" class="on">4 games</button><button data-v="6">6 games</button></div>
+      <button class="cta" id="singlePlay">Play match</button>
+    </div>
+  </section>
+
+  <section id="cups" class="screen">
+    <div class="head"><button class="back" data-go="home">‹</button><h2>Tournament</h2><p>Eight teams, three rounds. Lose once and you're out.</p></div>
+    <div id="cupCards" class="cups"></div>
+  </section>
+
+  <section id="bracket" class="screen">
+    <div class="head"><button class="back" data-go="cups">‹</button><h2 id="bracketTitle">Cup</h2></div>
+    <div id="bracketGrid" class="bracket"></div>
+    <button class="cta" id="bracketPlay">Play</button>
+  </section>
+
+  <section id="training" class="screen">
+    <div class="head"><button class="back" data-go="home">‹</button><h2>Training</h2><p id="trainBest"></p></div>
+  </section>
+
+  <section id="locker" class="screen">
+    <div class="head"><button class="back" data-go="home">‹</button><h2>Locker</h2></div>
+    <div class="lockerPanel card">
+      <div class="seg" id="lockerTabs"><button data-t="rackets" class="on">Rackets</button><button data-t="kits">Kits</button><button data-t="style">Style</button></div>
+      <div id="lockerGrid" class="items"></div>
+    </div>
+  </section>
+
+  <!-- match HUD -->
+  <div id="hud" class="hidden">
+    <div id="board">
+      <div class="bv" id="bVenue"></div>
+      <div class="row r0"><i class="sv" id="bSv0"></i><span class="nm" id="bN0">YOU</span><span class="g" id="bG0">0</span><span class="p" id="bP0">0</span></div>
+      <div class="row r1"><i class="sv" id="bSv1"></i><span class="nm" id="bN1">RIVALS</span><span class="g" id="bG1">0</span><span class="p" id="bP1">0</span></div>
+      <div class="bf" id="bFoot"></div>
+    </div>
+    <div id="trainHud" class="hidden">
+      <div><span>TIME</span><b id="trTime">60</b></div>
+      <div><span>SCORE</span><b id="trScore">0</b></div>
+      <div class="combo" id="trCombo"></div>
+    </div>
+    <button id="pauseBtn" class="icon">❚❚</button>
+    <div id="keysHint"><span><kbd>WASD</kbd> move · aim</span><span><kbd>Space</kbd> hit</span><span><kbd>Shift</kbd> lob / power</span></div>
+  </div>
+  <div id="banner"><div id="bnT"></div><div id="bnS"></div></div>
+  <div id="pops"></div>
+  <div id="toast"></div>
+
+  <div id="touchUI" class="hidden">
+    <div id="stickZone"><div id="stickBase"><div id="knob"></div></div></div>
+    <button id="tLob" class="tbtn lob">LOB<small>POWER</small></button>
+    <button id="tHit" class="tbtn hit">HIT</button>
+  </div>
+
+  <div id="pause" class="ov">
+    <div class="card dlg"><h2>Time out</h2><button class="cta" id="pResume">Resume</button><button class="ghost" id="pQuit">Quit match</button></div>
+  </div>
+
+  <div id="result" class="ov">
+    <div class="card dlg res">
+      <div id="rTrophy" class="rtrophy">🏆</div>
+      <div id="rTitle" class="rtitle">VICTORY!</div>
+      <div id="rScore" class="rscore"></div>
+      <div id="rSub" class="rsub"></div>
+      <div id="rStats" class="rstats"></div>
+      <div id="rRewards" class="rrewards"></div>
+      <button class="cta" id="rNext">Continue</button>
+      <div class="rbtns"><button class="ghost" id="rAgain">Play again</button><button class="ghost" id="rMenu">Menu</button></div>
+    </div>
+  </div>
+
+  <noscript>Padel Rush needs JavaScript.</noscript>
+  <script src="js/audio.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neon Ball — Classic Brick Breaker in Your Browser</title>
+  <meta name="description" content="Neon Ball: a fast, juicy brick breaker inspired by the 90s classics. Smash metallic bricks, chain explosions, catch power-ups — lasers, fireballs, multiball — and chase the high score.">
+  <meta name="theme-color" content="#07060f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Neon Ball home">
+      <span class="brand-ball"></span>
+      <span class="brand-text">NEON<b>BALL</b></span>
+    </a>
+    <nav class="top-actions">
+      <button id="btn-sound" class="icon-btn" title="Toggle sound (M)">🔊</button>
+      <button id="btn-full" class="icon-btn" title="Full screen (F)">⛶</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="stage-wrap">
+      <div class="stage" id="stage">
+        <canvas id="game" width="800" height="600" aria-label="Neon Ball game screen"></canvas>
+
+        <div class="overlay" id="overlay">
+          <!-- Title -->
+          <section class="panel" id="panel-title">
+            <h1 class="logo">NEON<span>BALL</span></h1>
+            <p class="tagline">Smash bricks. Chain explosions. Never drop the ball.</p>
+            <button id="btn-play" class="btn btn-primary">▶ PLAY</button>
+            <div class="start-level">
+              <label for="sel-level">Start at level</label>
+              <select id="sel-level"></select>
+            </div>
+            <div class="scores-box">
+              <h2>Hall of Fame</h2>
+              <ol id="scores-title" class="scores"></ol>
+            </div>
+            <p class="hint">Mouse moves · Click launches &amp; fires · <kbd>P</kbd> pause · <kbd>M</kbd> sound</p>
+          </section>
+
+          <!-- Pause -->
+          <section class="panel hidden" id="panel-pause">
+            <h2 class="panel-title">PAUSED</h2>
+            <button id="btn-resume" class="btn btn-primary">▶ RESUME</button>
+            <button id="btn-quit" class="btn btn-ghost">QUIT TO MENU</button>
+          </section>
+
+          <!-- Game over -->
+          <section class="panel hidden" id="panel-over">
+            <h2 class="panel-title danger">GAME OVER</h2>
+            <div class="final">
+              <div><span>Score</span><b id="final-score">0</b></div>
+              <div><span>Level</span><b id="final-level">1</b></div>
+            </div>
+            <form id="name-form" class="name-form hidden" autocomplete="off">
+              <label for="name-input">New high score! Enter your name</label>
+              <div class="name-row">
+                <input id="name-input" maxlength="12" placeholder="PLAYER" required>
+                <button class="btn btn-small" type="submit" id="btn-save">SAVE</button>
+              </div>
+            </form>
+            <div class="scores-box">
+              <h2>Hall of Fame</h2>
+              <ol id="scores-over" class="scores"></ol>
+            </div>
+            <div class="row">
+              <button id="btn-again" class="btn btn-primary">↻ PLAY AGAIN</button>
+              <button id="btn-menu" class="btn btn-ghost">MENU</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <section class="info">
+      <article class="card">
+        <h2>Controls</h2>
+        <ul class="keys">
+          <li><kbd>Mouse</kbd> / <kbd>←</kbd><kbd>→</kbd> move the paddle</li>
+          <li><kbd>Click</kbd> / <kbd>Space</kbd> launch ball · fire lasers</li>
+          <li><kbd>P</kbd> / <kbd>Esc</kbd> pause</li>
+          <li><kbd>M</kbd> sound on/off · <kbd>F</kbd> full screen</li>
+        </ul>
+        <p class="muted">Tip: where the ball hits the paddle decides its angle. Edges send it sideways. Break bricks in a row without touching the paddle to build a score multiplier.</p>
+      </article>
+      <article class="card">
+        <h2>Power-ups</h2>
+        <ul class="legend" id="power-legend"></ul>
+      </article>
+      <article class="card">
+        <h2>Bricks</h2>
+        <ul class="bricks-legend">
+          <li><i class="bk bk-color"></i> Colored: 1 hit</li>
+          <li><i class="bk bk-steel"></i> Steel: 3 hits</li>
+          <li><i class="bk bk-x"></i> Explosive: blows up its neighbours</li>
+          <li><i class="bk bk-gold"></i> Gold: unbreakable</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <footer class="foot">Inspired by the 1996 classic DX-Ball. Every graphic, level and sound here is original.</footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

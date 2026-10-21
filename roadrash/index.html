@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Road Fury — Combat Motorbike Racing</title>
+  <meta name="description" content="Road Fury: a combat motorbike racer inspired by the 90s classics. Punch rivals off their bikes, grab their chains, dodge traffic and outrun the cops across five highways.">
+  <meta name="theme-color" content="#0b0716">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Road Fury home">
+      <span class="brand-mark">⚡</span>
+      <span class="brand-text">ROAD<b>FURY</b></span>
+    </a>
+    <nav class="top-actions">
+      <span class="wallet hidden" id="wallet">$0</span>
+      <button id="btn-music" class="icon-btn" title="Music on/off">♫</button>
+      <button id="btn-sound" class="icon-btn" title="Sound on/off (M)">🔊</button>
+      <button id="btn-full" class="icon-btn" title="Full screen (F)">⛶</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="stage" id="stage">
+      <canvas id="game" aria-label="Road Fury game screen"></canvas>
+
+      <div class="overlay" id="overlay">
+        <!-- Main menu -->
+        <section class="panel menu" id="p-menu">
+          <h1 class="logo"><span>ROAD</span>FURY</h1>
+          <p class="tagline">Five highways. Eight riders. No rules.</p>
+          <div class="menu-list">
+            <button class="btn btn-primary" data-go="career">🏁 CAREER</button>
+            <button class="btn" data-go="quick">⚡ QUICK RACE</button>
+            <button class="btn" data-go="garage">🏍️ GARAGE</button>
+            <button class="btn" data-go="records">🏆 RECORDS</button>
+            <button class="btn btn-ghost" data-go="howto">❓ HOW TO PLAY</button>
+          </div>
+        </section>
+
+        <!-- New rider -->
+        <section class="panel narrow hidden" id="p-name">
+          <h2 class="panel-title">NEW RIDER</h2>
+          <p class="muted">What do they call you on the street?</p>
+          <form id="name-form" class="name-form" autocomplete="off">
+            <input id="name-input" maxlength="12" placeholder="RIDER NAME" required>
+            <button class="btn btn-primary" type="submit">RIDE ▶</button>
+          </form>
+          <p class="muted small">You start with a beat-up Sparrow 250 and $500. Finish top 3 on every track to move up a level.</p>
+          <button class="btn btn-ghost btn-small" data-go="menu">BACK</button>
+        </section>
+
+        <!-- Career hub -->
+        <section class="panel wide hidden" id="p-career">
+          <div class="hub-head">
+            <div>
+              <h2 class="panel-title left">LEVEL <span id="hub-level">1</span> <small id="hub-name"></small></h2>
+              <div class="level-pips" id="hub-pips"></div>
+            </div>
+            <div class="hub-stats">
+              <div class="stat"><span>Cash</span><b id="hub-money">$0</b></div>
+              <div class="stat"><span>Bike</span><b id="hub-bike">-</b></div>
+              <div class="stat"><span>Condition</span><b id="hub-hp">100%</b></div>
+            </div>
+          </div>
+          <div class="hub-repair hidden" id="hub-repair">
+            <span id="repair-text">Your bike needs repairs.</span>
+            <button class="btn btn-small btn-primary" id="btn-repair">REPAIR</button>
+          </div>
+          <p class="muted small">Pick a race. Finish in the top 3 to qualify. Qualify on all five tracks to unlock the next level.</p>
+          <div class="tracks" id="career-tracks"></div>
+          <div class="row">
+            <button class="btn btn-ghost btn-small" data-go="garage">🏍️ GARAGE</button>
+            <button class="btn btn-ghost btn-small" data-go="menu">MENU</button>
+          </div>
+        </section>
+
+        <!-- Quick race -->
+        <section class="panel wide hidden" id="p-quick">
+          <h2 class="panel-title">QUICK RACE</h2>
+          <div class="tracks" id="quick-tracks"></div>
+          <div class="quick-opts">
+            <label>Bike
+              <select id="quick-bike"></select>
+            </label>
+            <div class="seg" id="quick-level" role="radiogroup" aria-label="Difficulty"></div>
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" id="btn-quick-go">START ▶</button>
+            <button class="btn btn-ghost" data-go="menu">MENU</button>
+          </div>
+        </section>
+
+        <!-- Garage -->
+        <section class="panel wide hidden" id="p-garage">
+          <div class="hub-head">
+            <h2 class="panel-title left">GARAGE</h2>
+            <div class="stat"><span>Cash</span><b id="garage-money">$0</b></div>
+          </div>
+          <div class="bikes" id="bikes"></div>
+          <div class="row">
+            <button class="btn btn-ghost btn-small" id="garage-back">BACK</button>
+          </div>
+        </section>
+
+        <!-- Records -->
+        <section class="panel hidden" id="p-records">
+          <h2 class="panel-title">RECORDS</h2>
+          <div class="records" id="records"></div>
+          <div class="row">
+            <button class="btn btn-ghost btn-small" id="btn-reset">RESET CAREER</button>
+            <button class="btn btn-small" data-go="menu">MENU</button>
+          </div>
+        </section>
+
+        <!-- How to play -->
+        <section class="panel hidden" id="p-howto">
+          <h2 class="panel-title">HOW TO PLAY</h2>
+          <ul class="keys">
+            <li><span><kbd>↑</kbd> / <kbd>W</kbd></span> Throttle</li>
+            <li><span><kbd>↓</kbd> / <kbd>S</kbd></span> Brake</li>
+            <li><span><kbd>←</kbd><kbd>→</kbd> / <kbd>A</kbd><kbd>D</kbd></span> Steer</li>
+            <li><span><kbd>Z</kbd> / <kbd>J</kbd></span> Attack left</li>
+            <li><span><kbd>X</kbd> / <kbd>K</kbd></span> Attack right</li>
+            <li><span><kbd>Space</kbd> / <kbd>Shift</kbd></span> Nitro (N bikes)</li>
+            <li><span><kbd>P</kbd> / <kbd>Esc</kbd></span> Pause</li>
+          </ul>
+          <ul class="tips">
+            <li>Knock a rider off while they carry a <b>club</b> or <b>chain</b> and it's yours.</li>
+            <li>Each knockout pays a bonus. Knocking out a cop pays more.</li>
+            <li>Crash with a cop nearby and you're <b>busted</b>, which costs you a fine.</li>
+            <li>Every crash damages the bike. At 0% it's wrecked and the race is over.</li>
+            <li>Running off the road slows you down. Hitting trees, rocks or signs knocks you off.</li>
+          </ul>
+          <button class="btn btn-small" data-go="menu">GOT IT</button>
+        </section>
+
+        <!-- Pause -->
+        <section class="panel narrow hidden" id="p-pause">
+          <h2 class="panel-title">PAUSED</h2>
+          <button class="btn btn-primary" id="btn-resume">▶ RESUME</button>
+          <button class="btn" id="btn-restart">↻ RESTART RACE</button>
+          <button class="btn btn-ghost" id="btn-quit">QUIT RACE</button>
+        </section>
+
+        <!-- Results -->
+        <section class="panel hidden" id="p-results">
+          <h2 class="panel-title" id="res-title">1ST PLACE</h2>
+          <p class="res-sub" id="res-sub"></p>
+          <ol class="standings" id="res-table"></ol>
+          <div class="res-money" id="res-money"></div>
+          <div class="levelup hidden" id="res-levelup"></div>
+          <div class="row">
+            <button class="btn btn-primary" id="btn-continue">CONTINUE ▶</button>
+            <button class="btn" id="btn-retry">↻ RETRY</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- touch controls -->
+      <div class="touch hidden" id="touch">
+        <div class="t-left">
+          <button data-key="ArrowLeft" aria-label="Steer left">◀</button>
+          <button data-key="ArrowRight" aria-label="Steer right">▶</button>
+        </div>
+        <button class="t-pause" id="t-pause" aria-label="Pause">❚❚</button>
+        <div class="t-right">
+          <button data-key="KeyZ" class="t-atk" aria-label="Attack left">👊<small>L</small></button>
+          <button data-key="KeyX" class="t-atk" aria-label="Attack right">👊<small>R</small></button>
+          <button data-key="Space" class="t-nitro" aria-label="Nitro">N₂O</button>
+          <button data-key="ArrowDown" class="t-brake" aria-label="Brake">BRAKE</button>
+          <button data-key="ArrowUp" class="t-gas" aria-label="Throttle">GAS</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="info">
+      <article class="card">
+        <h2>Fight dirty</h2>
+        <p>Pull up beside a rival and swing with <kbd>Z</kbd> or <kbd>X</kbd>. Drain their health bar to knock them off, collect the KO bonus and take their weapon.</p>
+      </article>
+      <article class="card">
+        <h2>Five highways</h2>
+        <p>Sunset Coast, Redwood Valley, Desert Canyon, Neon Downtown and Alpine Pass. Each has its own curves, hills, traffic and scenery.</p>
+      </article>
+      <article class="card">
+        <h2>Build your ride</h2>
+        <p>Spend your winnings on seven bikes, from the rusty Sparrow 250 up to the Goliath 1300 N. Nitro bikes give you speed bursts on demand.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="foot">Inspired by the 1991 classic Road Rash. Every graphic, track and sound here is drawn and synthesized in code.</footer>
+
+  <script src="js/util.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/track.js"></script>
+  <script src="js/race.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

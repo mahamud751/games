@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Carrom Royale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="pcard" id="pc0">
+      <div class="coin-ico white"></div>
+      <div class="pinfo">
+        <div class="pname">You</div>
+        <div class="tray"></div>
+      </div>
+      <div class="boards"></div>
+    </div>
+    <div id="center">
+      <div id="queenState"><span class="qdot"></span><span id="queenText">Queen on board</span></div>
+      <div id="turn">Your turn</div>
+      <div id="ctrls">
+        <button id="btnSound" class="icon" title="Sound (M)">
+          <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+        </button>
+        <button id="btnPause" class="icon" title="Pause (Esc)">
+          <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="pcard right" id="pc1">
+      <div class="coin-ico black"></div>
+      <div class="pinfo">
+        <div class="pname">CPU</div>
+        <div class="tray"></div>
+      </div>
+      <div class="boards"></div>
+    </div>
+  </div>
+
+  <div id="placer" class="hidden">
+    <span class="lbl">Slide striker</span>
+    <input type="range" id="slider" min="0" max="1000" value="500">
+  </div>
+  <div id="toast"></div>
+  <div id="hint" class="hidden">Slide the striker along your line, then <b>press on it, pull back and let go</b> to shoot.</div>
+
+  <!-- Main menu -->
+  <div id="menu" class="overlay show">
+    <div class="panel menu-panel">
+      <div class="logo"><span class="w1">CARROM</span><span class="w2">ROYALE</span></div>
+      <p class="tag">The board game from every childhood afternoon. Flick the striker, sink your coins, and cover the Queen!</p>
+
+      <div class="opts">
+        <div class="row"><label>Mode</label>
+          <div class="seg" data-key="mode"><button data-v="cpu" class="on">vs CPU</button><button data-v="pvp">2 Players</button></div>
+        </div>
+        <div class="row" id="diffRow"><label>CPU</label>
+          <div class="seg" data-key="diff"><button data-v="easy">Easy</button><button data-v="normal" class="on">Normal</button><button data-v="hard">Hard</button></div>
+        </div>
+        <div class="row"><label>Match</label>
+          <div class="seg" data-key="boardsToWin"><button data-v="1" class="on">1 board</button><button data-v="2">Best of 3</button><button data-v="3">Best of 5</button></div>
+        </div>
+        <div class="row"><label>Aim</label>
+          <div class="seg" data-key="guide"><button data-v="1" class="on">Aim guide</button><button data-v="0">Pro (no guide)</button></div>
+        </div>
+      </div>
+
+      <div class="themes-head">Board</div>
+      <div class="themes" id="themes"></div>
+
+      <div class="rules">
+        <div><span class="coin-ico white sm"></span>You play <b>white</b>, your rival plays <b>black</b>. Pocket a coin of your colour to shoot again.</div>
+        <div><span class="coin-ico queen sm"></span>Sink the red <b>Queen</b>, then pocket one of your coins right after to cover it (+3).</div>
+        <div><span class="coin-ico striker sm"></span>If the <b>striker</b> falls in a pocket, that's a foul: one of your coins goes back to the centre.</div>
+        <div><span class="trophy-ico">★</span>Pocket all <b>9</b> of your coins with the Queen covered to win the board.</div>
+      </div>
+
+      <button id="btnStart" class="big">Let's play</button>
+      <div class="record" id="record"></div>
+    </div>
+  </div>
+
+  <!-- Board end -->
+  <div id="boardOv" class="overlay">
+    <div class="panel small">
+      <div class="kicker" id="boKicker">Board 1</div>
+      <h2 id="boTitle"></h2>
+      <p id="boSub"></p>
+      <div class="score" id="boScore"></div>
+      <button id="btnNext" class="big">Next board</button>
+    </div>
+  </div>
+
+  <!-- Match end -->
+  <div id="matchOv" class="overlay">
+    <div class="panel small">
+      <svg class="trophy" viewBox="0 0 64 64">
+        <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>
+        <path fill="url(#tg)" d="M18 6h28v8h10v6c0 8-6 13-13 14-2 5-5 8-8 9v7h9v8H20v-8h9v-7c-3-1-6-4-8-9C14 33 8 28 8 20v-6h10V6zm-4 14c0 4 3 7 6 8-1-3-2-6-2-8h-4zm36 0h-4c0 2-1 5-2 8 3-1 6-4 6-8z"/>
+      </svg>
+      <h2 id="moTitle"></h2>
+      <p id="moSub"></p>
+      <div class="score" id="moScore"></div>
+      <div class="btns">
+        <button id="btnRematch" class="big">Rematch</button>
+        <button id="btnMenu" class="ghost">Main menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div id="pauseOv" class="overlay">
+    <div class="panel small">
+      <h2>Paused</h2>
+      <p>Grab a snack, sprinkle some powder. The board will wait.</p>
+      <div class="btns col">
+        <button id="btnResume" class="big">Resume</button>
+        <button id="btnRestart" class="ghost">Restart board</button>
+        <button id="btnQuit" class="ghost">Quit to menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

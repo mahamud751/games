@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ridgefall — Downhill Racing</title>
+  <meta name="description" content="Ridgefall: a downhill bike, ATV and jet-boat racer. Race rivals, chase medals, and stack stunts off the ridges.">
+  <meta name="theme-color" content="#071016">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Teko:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Ridgefall downhill course"></canvas>
+
+  <header id="top">
+    <div class="wallet" id="credits">$0</div>
+    <button class="icon" id="btn-music" title="Music">♪</button>
+    <button class="icon" id="btn-sound" title="Sound (M)">🔊</button>
+    <button class="icon" id="btn-full" title="Full screen">⛶</button>
+  </header>
+
+  <section class="dock screen" id="scr-menu">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true">
+        <rect width="64" height="64" rx="16" fill="#d6ff4a"/>
+        <path d="M8 46 L24 22 L32 34 L42 16 L56 46 Z" fill="#102006"/>
+      </svg>
+      <div>
+        <small>DOWNHILL SERIES</small>
+        <h1>RIDGEFALL</h1>
+      </div>
+    </div>
+    <p class="tag">Five ridges. One way down. Keep the throttle open, land the flip, and take the finish before the mountain does.</p>
+    <div class="menu-list">
+      <button class="btn primary" data-go="modes">DROP IN</button>
+      <button class="btn" data-go="garage">GARAGE</button>
+      <button class="btn" data-go="records">RECORDS</button>
+      <button class="btn ghost" data-go="help">HOW TO RIDE</button>
+    </div>
+    <p class="fine">WASD or arrows · Space jump · Shift boost · E chute</p>
+  </section>
+
+  <section class="dock screen hidden" id="scr-modes">
+    <p class="eyebrow">PICK A WAY DOWN</p>
+    <h2>MODES</h2>
+    <div class="mode-list">
+      <button class="mode" data-mode="race"><i>R</i><div><b>RACE</b><span>Four riders. First to the banner takes the purse.</span></div><span class="go">→</span></button>
+      <button class="mode" data-mode="time"><i>T</i><div><b>TIME TRIAL</b><span>A ghost of your best line, and gold, silver, bronze.</span></div><span class="go">→</span></button>
+      <button class="mode" data-mode="free"><i>◆</i><div><b>FREERIDE</b><span>Gems in the air, stunts on the way down. No grid.</span></div><span class="go">→</span></button>
+      <button class="mode" data-mode="duel"><i>2</i><div><b>LOCAL DUEL</b><span>Split screen. Same bike. One mountain.</span></div><span class="go">→</span></button>
+    </div>
+    <button class="btn ghost" data-go="menu">BACK</button>
+  </section>
+
+  <section class="sheet screen hidden" id="scr-tracks">
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow">THE MOUNTAIN</p>
+        <h2>CHOOSE A RIDGE</h2>
+      </div>
+      <div class="row-between">
+        <button class="btn ghost small" data-go="modes">BACK</button>
+        <button class="btn primary" id="btn-drop">RIDE</button>
+      </div>
+    </div>
+    <div class="tracks grow" id="track-grid"></div>
+  </section>
+
+  <section class="sheet screen hidden" id="scr-garage">
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow">THE GARAGE</p>
+        <h2>WHAT YOU RIDE</h2>
+      </div>
+      <button class="btn ghost small" data-go="menu">BACK</button>
+    </div>
+    <label class="name-row">NAME <input id="rider-name" maxlength="12" autocomplete="off" spellcheck="false"></label>
+    <div class="garage grow" id="garage-grid"></div>
+  </section>
+
+  <section class="sheet screen hidden" id="scr-records">
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow">THE BOOK</p>
+        <h2>RECORDS</h2>
+      </div>
+      <button class="btn ghost small" data-go="menu">BACK</button>
+    </div>
+    <ul class="records grow" id="records-list"></ul>
+    <button class="btn ghost small" id="btn-wipe">Reset progress</button>
+  </section>
+
+  <section class="dock screen hidden" id="scr-help">
+    <p class="eyebrow">THE LINE</p>
+    <h2>HOW TO RIDE</h2>
+    <div class="help grow">
+      <div class="keys">
+        <div><kbd>D</kbd><kbd>→</kbd> gas</div>
+        <div><kbd>A</kbd><kbd>←</kbd> brake</div>
+        <div><kbd>W</kbd><kbd>↑</kbd> lean back</div>
+        <div><kbd>S</kbd><kbd>↓</kbd> nose down</div>
+        <div><kbd>Space</kbd> jump</div>
+        <div><kbd>Shift</kbd> boost</div>
+        <div><kbd>E</kbd> parachute</div>
+        <div><kbd>R</kbd> reset</div>
+      </div>
+      <ul class="tips">
+        <li>Hold lean back over a lip for a backflip. Nose down for a frontflip. Match the slope before you land.</li>
+        <li>The chute saves a bad rotation. It also kills your speed.</li>
+        <li>Ice and water slide. The ATV likes ice. The Wave Runner likes the lagoons.</li>
+        <li>Finish a ridge to open the next one. Medals pay better than just surviving.</li>
+        <li>Duel: guest uses the arrows, O to jump, P to chute, L to boost.</li>
+      </ul>
+    </div>
+    <button class="btn ghost" data-go="menu">BACK</button>
+  </section>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="place-block glass">
+        <span id="place-total">of 5</span>
+        <b id="place">1st</b>
+      </div>
+      <div class="timer-block glass">
+        <div class="pills"><em id="mode-pill">RACE</em><em id="track-pill">Pine</em></div>
+        <b id="timer">0:00.00</b>
+        <span id="best-line"></span>
+      </div>
+      <div class="score-block glass">
+        <div class="row"><div><span>Gems</span><b id="gems">0</b></div><div><span>Stunt</span><b id="score">0</b></div></div>
+        <div id="combo"></div>
+      </div>
+    </div>
+    <div id="callout-space"></div>
+    <div class="strip-wrap">
+      <p id="hint"></p>
+      <div class="strip"><i id="prog"></i><div id="dots"></div></div>
+    </div>
+    <div class="hud-bot">
+      <div class="speedo">
+        <svg viewBox="0 0 120 90" aria-hidden="true">
+          <defs>
+            <linearGradient id="arcg" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#d6ff4a"/>
+              <stop offset="1" stop-color="#7dd3fc"/>
+            </linearGradient>
+          </defs>
+          <path d="M18 64 Q 60 6 102 64" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="8" stroke-linecap="round"/>
+          <path id="spd-arc" d="M18 64 Q 60 6 102 64" fill="none" stroke="url(#arcg)" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+        <div class="read"><b id="spd">0</b><span>km/h</span></div>
+      </div>
+      <div id="hud-guest" class="glass hidden">GUEST <b id="guest-place">2nd</b> <span id="guest-spd">0</span></div>
+      <div class="meters">
+        <button class="icon" id="btn-pause" title="Pause">❚❚</button>
+        <div class="meter"><span>BOOST</span><i><b id="nitro-fill"></b></i></div>
+        <div class="flags"><b id="air-ind">AIR</b><b id="chute-ind">CHUTE</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="touch" class="hidden">
+    <div class="cluster">
+      <button data-act="brake">BRAKE</button>
+      <button data-act="back">BACK</button>
+      <button data-act="fore">NOSE</button>
+    </div>
+    <div class="cluster">
+      <button data-act="jump">JUMP</button>
+      <button data-act="chute">CHUTE</button>
+      <button data-act="nitro">BOOST</button>
+      <button data-act="gas" class="gas">GAS</button>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay hidden">
+    <div class="card">
+      <p class="eyebrow">HOLDING</p>
+      <h2>PAUSED</h2>
+      <div class="actions">
+        <button class="btn primary" id="btn-resume">RESUME</button>
+        <button class="btn" id="btn-restart">RESTART</button>
+        <button class="btn ghost" id="btn-quit">QUIT</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="results" class="overlay hidden">
+    <div class="card">
+      <div class="res-top">
+        <div>
+          <p class="eyebrow" id="res-kicker">North Ridge</p>
+          <h2 id="res-title">YOU TOOK THE RIDGE</h2>
+        </div>
+        <div class="medal none" id="res-medal">–</div>
+      </div>
+      <div class="stats">
+        <div><span id="res-place-label">Place</span><b id="res-place">1st</b></div>
+        <div><span>Time</span><b id="res-time">0:00.00</b></div>
+        <div><span>Stunt</span><b id="res-score">0</b></div>
+        <div><span>Gems</span><b id="res-gems">0</b></div>
+      </div>
+      <p class="tag"><b id="res-pay">+$0</b> <span id="res-note"></span></p>
+      <ul id="res-list"></ul>
+      <div class="actions">
+        <button class="btn primary" id="btn-retry">RIDE AGAIN</button>
+        <button class="btn" id="btn-again-tracks">RIDGES</button>
+        <button class="btn ghost" data-go="menu">MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

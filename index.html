@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playhouse — All Games</title>
+  <meta name="description" content="Playhouse is the front door for every game: racing, padel, pool, carrom, brawlers, and arcade. Pick one and play in the browser.">
+  <meta name="theme-color" content="#14120f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a class="logo" href="./"><span class="mark">P</span> Playhouse</a>
+      <span class="meta" id="count">10 games</span>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">One door. Every game.</p>
+      <h1>Come in.<br>Pick a table.</h1>
+      <p class="lede">Racing, brawls, padel, pool, and the quieter games in between. They all live here. Nothing to install.</p>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track" id="marquee"></div>
+    </div>
+
+    <div class="bar">
+      <div class="filters" role="tablist" aria-label="Game types">
+        <button class="on" data-filter="all">All</button>
+        <button data-filter="racing">Racing</button>
+        <button data-filter="sports">Sports</button>
+        <button data-filter="arcade">Arcade</button>
+        <button data-filter="table">Table</button>
+      </div>
+      <input class="search" id="search" type="search" placeholder="Find a game" aria-label="Find a game">
+    </div>
+
+    <main class="grid" id="grid"></main>
+
+    <footer>
+      <span>Playhouse</span>
+      <span>Scores stay on this device, inside each game.</span>
+    </footer>
+  </div>
+
+  <script>
+    const GAMES = [
+      { href: 'night-city-racing/', name: 'Nightshift', kind: 'racing', tag: 'Racing', line: 'City lights, open roads, and a personal best after dark.', color: '#1b2438', ink: '#d7e4ff', mark: night },
+      { href: 'ridgefall/', name: 'Ridgefall', kind: 'racing', tag: 'Racing', line: 'Downhill bikes, an ATV, and a jet boat. Land the flip.', color: '#1d2a14', ink: '#e4ff8a', mark: ridge },
+      { href: 'roadrash/', name: 'Road Fury', kind: 'racing', tag: 'Racing', line: 'Combat motorbikes. Punch rivals off and outrun the cops.', color: '#2a140c', ink: '#ffd0a8', mark: fury },
+      { href: 'padel/', name: 'Padel Rush', kind: 'sports', tag: 'Sports', line: 'Fast padel rallies. Climb the glass and take the point.', color: '#102430', ink: '#b9ecff', mark: padel },
+      { href: 'sunblade/', name: 'Sunblade', kind: 'arcade', tag: 'Arcade', line: 'A hero with a sun disc, crossing ancient stages.', color: '#2a1c08', ink: '#ffe08a', mark: sun },
+      { href: 'brawl-heroes/', name: 'Brawl Heroes', kind: 'arcade', tag: 'Arcade', line: 'One-on-one brawler. Combos, specials, no polite exits.', color: '#2a1018', ink: '#ffc2ce', mark: brawl },
+      { href: 'pen-fight/', name: 'Pen Clash', kind: 'arcade', tag: 'Arcade', line: 'Schoolyard pen fight. Flick, spin, knock them off the desk.', color: '#17200e', ink: '#e4f5b5', mark: pen },
+      { href: 'dx-ball/', name: 'Neon Ball', kind: 'arcade', tag: 'Arcade', line: 'Brick breaker with lasers, fireballs, and multiball.', color: '#1a1028', ink: '#e4d4ff', mark: ball },
+      { href: 'carrom/', name: 'Carrom Royale', kind: 'table', tag: 'Table', line: 'Classic carrom. Pocket your coins, then the queen.', color: '#2a2114', ink: '#f3e0b8', mark: carrom },
+      { href: 'pool/', name: 'Corner Pocket', kind: 'table', tag: 'Table', line: 'After-hours 8-ball. You, a friend, or the house player.', color: '#0e2420', ink: '#b8fff0', mark: pocket }
+    ];
+
+    function svg(paths, ink) {
+      return '<svg viewBox="0 0 80 80" fill="none" aria-hidden="true" stroke="' + ink + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
+    }
+    function night(ink) { return svg('<path d="M14 50h52"/><path d="M22 50l8-16h20l8 16"/><circle cx="30" cy="50" r="5"/><circle cx="52" cy="50" r="5"/><path d="M18 28c8-10 22-12 34-4"/>', ink); }
+    function ridge(ink) { return svg('<path d="M10 58 L28 28 L40 42 L52 18 L70 58"/><circle cx="58" cy="22" r="4" fill="' + ink + '" stroke="none"/>', ink); }
+    function fury(ink) { return svg('<circle cx="24" cy="50" r="8"/><circle cx="56" cy="50" r="8"/><path d="M24 42h22l8-10h8"/><path d="M32 42l6-12h10"/>', ink); }
+    function padel(ink) { return svg('<rect x="28" y="14" width="24" height="34" rx="10"/><path d="M40 48v16"/><path d="M16 24h10M54 24h10M16 36h8"/>', ink); }
+    function sun(ink) { return svg('<circle cx="40" cy="40" r="10"/><path d="M40 14v8M40 58v8M14 40h8M58 40h8M22 22l6 6M52 52l6 6M58 22l-6 6M28 52l-6 6"/>', ink); }
+    function brawl(ink) { return svg('<circle cx="28" cy="24" r="7"/><circle cx="52" cy="24" r="7"/><path d="M20 58c2-12 10-16 16-16h8c6 0 14 4 16 16"/><path d="M34 36l6 8 6-8"/>', ink); }
+    function pen(ink) { return svg('<path d="M18 58 L34 18h8L30 58z"/><path d="M46 22l16 36h-8L42 22z"/>', ink); }
+    function ball(ink) { return svg('<rect x="16" y="18" width="14" height="8" rx="1"/><rect x="33" y="18" width="14" height="8"/><rect x="50" y="18" width="14" height="8"/><circle cx="36" cy="44" r="5" fill="' + ink + '" stroke="none"/><path d="M22 64h28"/>', ink); }
+    function carrom(ink) { return svg('<rect x="14" y="14" width="52" height="52" rx="4"/><circle cx="22" cy="22" r="3" fill="' + ink + '" stroke="none"/><circle cx="58" cy="22" r="3" fill="' + ink + '" stroke="none"/><circle cx="22" cy="58" r="3" fill="' + ink + '" stroke="none"/><circle cx="58" cy="58" r="3" fill="' + ink + '" stroke="none"/><circle cx="40" cy="40" r="6"/>', ink); }
+    function pocket(ink) { return svg('<rect x="12" y="22" width="56" height="36" rx="8"/><circle cx="24" cy="40" r="5"/><circle cx="40" cy="40" r="5" fill="' + ink + '" stroke="none"/><circle cx="54" cy="34" r="4"/><circle cx="56" cy="46" r="4"/>', ink); }
+
+    const grid = document.getElementById('grid');
+    const search = document.getElementById('search');
+    let filter = 'all';
+
+    const names = GAMES.map(g => '<b>' + g.name + '</b>').join('<span>·</span>');
+    document.getElementById('marquee').innerHTML = (names + names);
+
+    function card(g) {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = g.href;
+      a.dataset.kind = g.kind;
+      a.dataset.name = (g.name + ' ' + g.line).toLowerCase();
+      a.innerHTML =
+        '<div class="art" style="background:' + g.color + '"><span class="glow"></span>' + g.mark(g.ink) + '<span class="play">PLAY</span></div>' +
+        '<div class="body"><span class="tag">' + g.tag + '</span><h2>' + g.name + '</h2><p>' + g.line + '</p></div>';
+      return a;
+    }
+    GAMES.forEach(g => grid.appendChild(card(g)));
+
+    function apply() {
+      const q = search.value.trim().toLowerCase();
+      let shown = 0;
+      for (const el of grid.querySelectorAll('.card')) {
+        const ok = (filter === 'all' || el.dataset.kind === filter) && (!q || el.dataset.name.includes(q));
+        el.hidden = !ok;
+        if (ok) shown++;
+      }
+      let empty = document.getElementById('empty');
+      if (!shown) {
+        if (!empty) {
+          empty = document.createElement('p');
+          empty.id = 'empty';
+          empty.className = 'empty';
+          empty.textContent = 'Nothing by that name. Try another word.';
+          grid.appendChild(empty);
+        }
+      } else if (empty) empty.remove();
+      document.getElementById('count').textContent = shown + (shown === 1 ? ' game' : ' games');
+    }
+
+    document.querySelectorAll('.filters button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        filter = btn.dataset.filter;
+        document.querySelectorAll('.filters button').forEach(b => b.classList.toggle('on', b === btn));
+        apply();
+      });
+    });
+    search.addEventListener('input', apply);
+  </script>
+</body>
+</html>

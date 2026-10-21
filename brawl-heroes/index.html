@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Brawl Heroes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="game"></canvas>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div class="ph" id="ph0">
+        <canvas class="face"></canvas>
+        <div class="info">
+          <div class="r1"><span class="nm">REX</span><span class="lives"></span><span class="sc">0</span></div>
+          <div class="hp"><i class="lag"></i><i class="fill"></i></div>
+          <div class="pw"><i></i><b>SUPER</b></div>
+          <div class="tgt"><span class="tn"></span><div class="tbar"><i></i></div></div>
+        </div>
+        <div class="combo"></div>
+      </div>
+      <div id="stageName"></div>
+      <div class="ph right" id="ph1">
+        <canvas class="face"></canvas>
+        <div class="info">
+          <div class="r1"><span class="nm">NOVA</span><span class="lives"></span><span class="sc">0</span></div>
+          <div class="hp"><i class="lag"></i><i class="fill"></i></div>
+          <div class="pw"><i></i><b>SUPER</b></div>
+          <div class="tgt"><span class="tn"></span><div class="tbar"><i></i></div></div>
+        </div>
+        <div class="combo"></div>
+      </div>
+      <div id="btns">
+        <button id="btnMusic" class="icon" title="Music">♪</button>
+        <button id="btnSfx" class="icon" title="Sound effects">🔊</button>
+        <button id="btnPause" class="icon" title="Pause (Esc)">❚❚</button>
+      </div>
+    </div>
+
+    <div id="bossBar" class="hidden">
+      <div class="bn"><span id="bossName"></span><span id="bossTitle"></span></div>
+      <div class="hp"><i class="lag"></i><i class="fill"></i></div>
+    </div>
+
+    <div id="card" class="hidden"><div class="k" id="cardK"></div><div class="t" id="cardT"></div><div class="s" id="cardS"></div></div>
+
+    <!-- Title -->
+    <div id="title" class="ov show">
+      <div class="logo"><span class="a">BRAWL</span><span class="b">HEROES</span></div>
+      <p class="tag">Fight through the city streets, beat every boss, and clean up the town — alone or with a friend.</p>
+      <div class="menu">
+        <button class="mbtn hot" data-players="1">1 Player</button>
+        <button class="mbtn" data-players="2">2 Players · Co-op</button>
+      </div>
+      <div class="seg" id="diffSeg"><button data-v="easy">Easy</button><button data-v="normal" class="on">Normal</button><button data-v="hard">Hard</button></div>
+      <div class="keys">
+        <div><b>1 Player</b> Move: WASD / Arrows · Attack: J / Z · Jump: K / X / Space · Special: L / C</div>
+        <div><b>2 Players</b> P1: WASD + J K L · P2: Arrows + 1 2 3 (numpad) or , . /</div>
+        <div><b>Moves</b> Double-tap to run · Walk into an enemy to grab · Jump + Attack = flying kick · Special costs a little health, or does a SUPER when the bar is full</div>
+        <div><b>Gamepad</b> X attack · A jump · B special · Start pause</div>
+      </div>
+      <div class="hi" id="hiScore"></div>
+    </div>
+
+    <!-- Character select -->
+    <div id="select" class="ov">
+      <h2>Choose your fighter</h2>
+      <div class="heroes" id="heroes"></div>
+      <div class="selbtns">
+        <button class="mbtn ghost" id="btnBack">Back</button>
+        <button class="mbtn hot" id="btnFight">FIGHT!</button>
+      </div>
+    </div>
+
+    <!-- Pause -->
+    <div id="pause" class="ov dim">
+      <div class="panel">
+        <h2>Paused</h2>
+        <button class="mbtn hot" id="btnResume">Resume</button>
+        <button class="mbtn ghost" id="btnRestart">Restart stage</button>
+        <button class="mbtn ghost" id="btnQuit">Quit to title</button>
+      </div>
+    </div>
+
+    <!-- Stage clear -->
+    <div id="clear" class="ov dim">
+      <div class="panel">
+        <div class="big">STAGE CLEAR!</div>
+        <div class="tally" id="tally"></div>
+        <button class="mbtn hot" id="btnNext">Next stage</button>
+      </div>
+    </div>
+
+    <!-- Continue -->
+    <div id="cont" class="ov dim">
+      <div class="panel">
+        <div class="big red">CONTINUE?</div>
+        <div class="count" id="contCount">9</div>
+        <p id="contLeft"></p>
+        <button class="mbtn hot" id="btnCont">Continue</button>
+        <button class="mbtn ghost" id="btnGiveUp">Give up</button>
+      </div>
+    </div>
+
+    <!-- Game over / ending -->
+    <div id="over" class="ov dim">
+      <div class="panel">
+        <div class="big" id="overT">GAME OVER</div>
+        <p id="overS"></p>
+        <div class="tally" id="overScore"></div>
+        <button class="mbtn hot" id="btnTitle">Back to title</button>
+      </div>
+    </div>
+
+    <!-- Touch controls -->
+    <div id="touch" class="hidden">
+      <div id="stick"><div id="knob"></div></div>
+      <div id="tbtns">
+        <button data-b="spc" class="tb s">SP</button>
+        <button data-b="jump" class="tb j">JUMP</button>
+        <button data-b="atk" class="tb a">HIT</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/input.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Sunblade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="game"></canvas>
+
+    <div id="hud" class="hidden">
+      <div class="hl">
+        <div class="row"><div id="hearts"></div><span id="lives">×3</span></div>
+        <div id="energy" title="Ra energy — press Special to throw the sun disc"><i></i><b>RA</b></div>
+        <div id="potion" class="hidden"><span class="pn"></span><div class="pt"><i></i></div></div>
+      </div>
+      <div id="letters"></div>
+      <div class="hr">
+        <div id="coins"><span class="ank">☥</span><b>0</b></div>
+        <div id="score">0000000</div>
+      </div>
+    </div>
+    <div id="btns" class="hidden-on-title">
+      <button id="btnMusic" class="icon" title="Music (M)">♪</button>
+      <button id="btnSfx" class="icon" title="Sound effects">🔊</button>
+      <button id="btnPause" class="icon" title="Pause (Esc)">❚❚</button>
+    </div>
+
+    <div id="bossBar" class="hidden">
+      <div class="bn"><span id="bossName"></span><span id="bossTitle"></span></div>
+      <div class="hp"><i class="lag"></i><i class="fill"></i></div>
+    </div>
+
+    <div id="card" class="hidden"><div class="k" id="cardK"></div><div class="t" id="cardT"></div><div class="s" id="cardS"></div></div>
+
+    <!-- title -->
+    <div id="title" class="ov show">
+      <div class="crest">☀</div>
+      <div class="logo">SUNBLADE</div>
+      <div class="sublogo">Legend of the Nile</div>
+      <p class="tag">Take up the golden khopesh, collect the eight sacred letters and stop the Serpent of Chaos from swallowing the sun.</p>
+      <div class="menu">
+        <button class="mbtn hot" id="btnNew">New Adventure</button>
+        <button class="mbtn hidden" id="btnContinue">Continue</button>
+      </div>
+      <div class="seg" id="diffSeg"><button data-v="easy">Easy</button><button data-v="normal" class="on">Normal</button><button data-v="hard">Hard</button></div>
+      <div class="keys">
+        <div><b>Move</b> A D / ← →</div>
+        <div><b>Jump</b> K / X / Space · press again in the air to double-jump</div>
+        <div><b>Sword</b> J / Z · 3-hit combo · Down + Sword in the air = plunge strike</div>
+        <div><b>Sun disc</b> L / C · uses Ra energy · Down + Jump drops through ledges</div>
+      </div>
+      <div class="hi" id="hiScore"></div>
+    </div>
+
+    <!-- chapter map -->
+    <div id="map" class="ov dim">
+      <div class="papyrus">
+        <div class="ph">The Journey</div>
+        <div id="nodes"></div>
+        <div class="mt" id="mapTitle"></div>
+        <div class="ms" id="mapSub"></div>
+        <div class="btns">
+          <button class="mbtn ghost" id="btnMapBack">Title</button>
+          <button class="mbtn hot" id="btnBegin">Begin</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pause" class="ov dim">
+      <div class="panel">
+        <h2>Paused</h2>
+        <button class="mbtn hot" id="btnResume">Resume</button>
+        <button class="mbtn ghost" id="btnRestart">Restart chapter</button>
+        <button class="mbtn ghost" id="btnQuit">Quit to title</button>
+      </div>
+    </div>
+
+    <div id="clear" class="ov dim">
+      <div class="panel">
+        <div class="big">CHAPTER COMPLETE</div>
+        <div class="tally" id="tally"></div>
+        <button class="mbtn hot" id="btnNext">Continue</button>
+      </div>
+    </div>
+
+    <div id="over" class="ov dim">
+      <div class="panel">
+        <div class="big" id="overT"></div>
+        <p id="overS"></p>
+        <button class="mbtn hot" id="btnRetry">Try again</button>
+        <button class="mbtn ghost" id="btnTitle">Back to title</button>
+      </div>
+    </div>
+
+    <div id="touch" class="hidden">
+      <div id="stick"><div id="knob"></div></div>
+      <div id="tbtns">
+        <button data-b="spc" class="tb s">☀</button>
+        <button data-b="jump" class="tb j">JUMP</button>
+        <button data-b="atk" class="tb a">⚔</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/input.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
