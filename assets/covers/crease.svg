@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#10243a"/>
+  <circle cx="180" cy="80" r="16" fill="#fff"/>
+  <circle cx="480" cy="60" r="16" fill="#fff"/>
+  <circle cx="760" cy="90" r="16" fill="#fff"/>
+  <path d="M120 250 H840 L960 500 H0 Z" fill="#1f7a3a"/>
+  <path d="M430 470 H530 M480 300 V470" stroke="#fff" stroke-width="4" fill="none" opacity=".7"/>
+  <rect x="250" y="430" width="460" height="28" rx="14" fill="rgba(0,0,0,.45)"/>
+  <rect x="360" y="430" width="140" height="28" fill="#f5d76e"/>
+  <rect x="470" y="418" width="12" height="52" rx="4" fill="#fff"/>
+  <text x="56" y="150" fill="#f4f7fb" font-family="Arial Black, sans-serif" font-size="78">CREASE</text>
+  <text x="60" y="190" fill="#7dff4a" font-family="Arial, sans-serif" font-size="22" font-weight="700">TWO OVERS</text>
+</svg>

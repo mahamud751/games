@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kickoff — Playhouse</title>
+  <meta name="theme-color" content="#07140e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <h1>Kickoff</h1>
+      <div class="score" aria-live="polite"><b id="s0">0</b><span id="clock">1:10</span><b id="s1">0</b></div>
+    </header>
+    <div class="stage">
+      <canvas id="c" width="1000" height="560" aria-label="Football pitch"></canvas>
+      <div class="overlay" id="menu">
+        <p class="kicker">Three a side</p>
+        <h2>First to five.</h2>
+        <p>Move your captain and hit Shoot when you want the goal. Teammates make their own runs.</p>
+        <div class="row">
+          <button type="button" class="primary" id="one">Play the house</button>
+          <button type="button" id="two">Two players</button>
+        </div>
+      </div>
+      <div class="overlay" id="end" hidden>
+        <p class="kicker">Full time</p>
+        <h2 id="endTitle">Coral wins</h2>
+        <button type="button" class="primary" id="again">Rematch</button>
+      </div>
+      <div class="banner" id="banner" hidden>GOAL</div>
+    </div>
+    <div class="controls">
+      <p>You: WASD or the mouse. Shoot with Space.</p>
+      <p id="p2help" hidden>Friend: arrow keys. Shoot with L.</p>
+      <button type="button" id="shoot">Shoot</button>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

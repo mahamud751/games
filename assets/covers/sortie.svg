@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#070b16"/>
+  <g fill="#fff">
+    <circle cx="80" cy="60" r="1.5"/><circle cx="160" cy="120" r="1.5"/><circle cx="240" cy="40" r="1.5"/>
+    <circle cx="400" cy="90" r="1.5"/><circle cx="520" cy="50" r="1.5"/><circle cx="700" cy="80" r="1.5"/>
+    <circle cx="840" cy="140" r="1.5"/><circle cx="300" cy="180" r="1.5"/><circle cx="900" cy="40" r="1.5"/>
+  </g>
+  <path d="M470 390 L430 470 H510 Z" fill="#7ee0ff"/>
+  <rect x="455" y="410" width="30" height="28" fill="#fff"/>
+  <path d="M250 140 L290 200 H210 Z" fill="#ff8b6a"/>
+  <path d="M690 180 L740 250 H640 Z" fill="#c9d4e4"/>
+  <rect x="560" y="70" width="150" height="36" rx="4" fill="#8ea0b8"/>
+  <text x="56" y="500" fill="#eef6ff" font-family="Arial Black, sans-serif" font-size="72">SORTIE</text>
+</svg>

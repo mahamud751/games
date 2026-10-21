@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ludo House — Playhouse</title>
+  <meta name="theme-color" content="#123326">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <div class="title">
+        <h1>Ludo House</h1>
+        <p id="note">Pick a table</p>
+      </div>
+    </header>
+    <div class="layout">
+      <div class="felt">
+        <div class="board" id="board" aria-label="Ludo board"></div>
+      </div>
+      <aside>
+        <div class="panel">
+          <div class="who" id="who"></div>
+          <button type="button" class="die" id="die" aria-label="Roll the dice"></button>
+          <p class="hint">A six steps out of the yard and earns another roll. Three sixes in a row burn the turn. Land on one rival to send them home. Two rivals together are a block. You need the exact count to finish.</p>
+          <div class="modes">
+            <button type="button" data-mode="house" class="on">Vs house</button>
+            <button type="button" data-mode="two">2 players</button>
+            <button type="button" data-mode="four">4 players</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="overlay" id="end" hidden>
+    <div class="sheet">
+      <p class="kicker">Home</p>
+      <h2 id="endTitle">Red wins</h2>
+      <button type="button" id="again" class="primary">Play again</button>
+    </div>
+  </div>
+  <script src="rules.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

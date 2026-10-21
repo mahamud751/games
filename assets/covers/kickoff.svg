@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#146b34"/>
+  <g fill="#187a3c">
+    <rect x="0" y="0" width="96" height="540"/>
+    <rect x="192" y="0" width="96" height="540"/>
+    <rect x="384" y="0" width="96" height="540"/>
+    <rect x="576" y="0" width="96" height="540"/>
+    <rect x="768" y="0" width="96" height="540"/>
+  </g>
+  <rect x="40" y="30" width="880" height="480" fill="none" stroke="#fff" stroke-width="4" opacity=".8"/>
+  <line x1="480" y1="30" x2="480" y2="510" stroke="#fff" stroke-width="4" opacity=".8"/>
+  <circle cx="480" cy="270" r="70" fill="none" stroke="#fff" stroke-width="4" opacity=".8"/>
+  <circle cx="250" cy="230" r="22" fill="#ff6b57"/>
+  <circle cx="300" cy="320" r="22" fill="#ff6b57"/>
+  <circle cx="680" cy="250" r="22" fill="#4cc3ff"/>
+  <circle cx="640" cy="340" r="22" fill="#4cc3ff"/>
+  <circle cx="470" cy="280" r="16" fill="#f7f7f2" stroke="#222" stroke-width="3"/>
+  <text x="56" y="110" fill="#f3fff6" font-family="Arial Black, sans-serif" font-size="68">KICKOFF</text>
+</svg>

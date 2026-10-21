@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sortie — Playhouse</title>
+  <meta name="theme-color" content="#070b16">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <h1>Sortie</h1>
+    </header>
+    <div class="cockpit">
+      <div class="stage">
+        <canvas id="c" width="480" height="720" aria-label="Air battle"></canvas>
+        <div class="overlay" id="menu">
+          <p class="kicker">Night sortie</p>
+          <h2>Hold the lane.</h2>
+          <p>Move with the mouse, WASD, or a finger. Guns are live. Every fourth wave sends a gunship.</p>
+          <button type="button" class="primary" id="play">Scramble</button>
+        </div>
+        <div class="overlay" id="over" hidden>
+          <p class="kicker">Shot down</p>
+          <h2 id="final">0</h2>
+          <button type="button" class="primary" id="again">Fly again</button>
+        </div>
+      </div>
+      <aside>
+        <div><small>Score</small><b id="score">0</b></div>
+        <div><small>Best</small><b id="best">0</b></div>
+        <div><small>Wave</small><b id="wave">1</b></div>
+        <div><small>Lives</small><b id="lives">3</b></div>
+        <p>Grab the blue drop for a spread shot. The gold drop patches a wing.</p>
+      </aside>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sling Riot — Playhouse</title>
+  <meta name="theme-color" content="#1b120e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <div class="title">
+        <h1>Sling Riot</h1>
+        <p id="levelName">Porch</p>
+      </div>
+      <div class="hud">
+        <span id="pebbles"></span>
+        <b id="score">0</b>
+      </div>
+    </header>
+    <div class="stage">
+      <canvas id="c" width="960" height="540" aria-label="Slingshot courtyard"></canvas>
+      <div class="overlay" id="menu">
+        <p class="kicker">Dusk courtyards</p>
+        <h2>Pull. Aim. Drop every lantern.</h2>
+        <div class="levels" id="levels"></div>
+      </div>
+      <div class="overlay" id="result" hidden>
+        <p class="kicker" id="resultKicker">Cleared</p>
+        <h2 id="resultTitle"></h2>
+        <p id="stars"></p>
+        <div class="row">
+          <button type="button" id="retry">Retry</button>
+          <button type="button" class="primary" id="next">Next courtyard</button>
+        </div>
+      </div>
+    </div>
+    <p class="help">Drag the pebble back and let go. Wood splits, stone holds, glass goes in one hit.</p>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

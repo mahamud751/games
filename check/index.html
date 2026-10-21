@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check — Playhouse</title>
+  <meta name="theme-color" content="#1a1612">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <div class="title">
+        <h1>Check</h1>
+        <p id="status">White to move</p>
+      </div>
+      <div class="modes" role="group" aria-label="Who plays">
+        <button id="modeAi" class="on" type="button">Vs house</button>
+        <button id="modeHot" type="button">Pass &amp; play</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="board-wrap">
+        <div class="board" id="board" role="grid" aria-label="Chessboard"></div>
+      </div>
+      <aside>
+        <div class="panel">
+          <h2>Table</h2>
+          <div class="colors" id="colors">
+            <button type="button" data-color="w" class="on">Play white</button>
+            <button type="button" data-color="b">Play black</button>
+          </div>
+          <p class="hint">Click a piece, then a square. Castling, en passant, and promotion are all in. The house looks three moves ahead.</p>
+          <ol id="log"></ol>
+          <div class="row">
+            <button type="button" id="undo">Undo</button>
+            <button type="button" id="fresh" class="primary">New game</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="overlay" id="promo" hidden>
+    <div class="sheet" role="dialog" aria-label="Promote pawn">
+      <h2>Promote to</h2>
+      <div class="choices" id="promoChoices"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="end" hidden>
+    <div class="sheet">
+      <p class="kicker" id="endKicker">Game</p>
+      <h2 id="endTitle">Checkmate</h2>
+      <p id="endText"></p>
+      <button type="button" id="endAgain" class="primary">Play again</button>
+    </div>
+  </div>
+
+  <script src="engine.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

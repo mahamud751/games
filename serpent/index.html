@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Serpent — Playhouse</title>
+  <meta name="theme-color" content="#07140f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <h1>Serpent</h1>
+      <div class="scores">
+        <span>Score <b id="score">0</b></span>
+        <span>Best <b id="best">0</b></span>
+      </div>
+    </header>
+    <div class="stage">
+      <canvas id="c" width="600" height="600" aria-label="Snake board"></canvas>
+      <div class="overlay" id="menu">
+        <p class="kicker">One apple. No second chances.</p>
+        <h2>Keep the line moving</h2>
+        <p>Arrows or WASD. Swipe on a phone. Walls end the run, unless you switch to wrap.</p>
+        <div class="row">
+          <button type="button" id="walls" class="on">Walls</button>
+          <button type="button" id="wrap">Wrap</button>
+        </div>
+        <button type="button" class="primary" id="play">Start</button>
+      </div>
+      <div class="overlay" id="over" hidden>
+        <p class="kicker">Run over</p>
+        <h2 id="final">0</h2>
+        <button type="button" class="primary" id="again">Again</button>
+      </div>
+    </div>
+    <p class="help">P pauses. Eat five and the board speeds up.</p>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

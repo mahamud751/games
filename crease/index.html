@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crease — Playhouse</title>
+  <meta name="theme-color" content="#07111a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <a class="back" href="../">Playhouse</a>
+      <h1>Crease</h1>
+      <p id="best"></p>
+    </header>
+    <div class="stage">
+      <canvas id="c" width="960" height="540" aria-label="Cricket ground"></canvas>
+      <div class="bug">
+        <div><b id="line">0/0</b><small id="overs">0.0 overs</small></div>
+        <div class="target" id="target">Target —</div>
+      </div>
+      <div class="meter" id="meter" hidden>
+        <i class="sweet"></i>
+        <i class="mark" id="mark"></i>
+      </div>
+      <div class="call" id="call" hidden></div>
+      <div class="overlay" id="menu">
+        <p class="kicker">Two overs · three wickets</p>
+        <h2>Time the shot.</h2>
+        <p>The marker sweeps the bar. Strike as it crosses the gold band. Miss the ball and you can walk.</p>
+        <button type="button" class="primary" id="play">Take guard</button>
+      </div>
+      <div class="overlay" id="end" hidden>
+        <p class="kicker" id="endKicker">Innings</p>
+        <h2 id="endTitle"></h2>
+        <p id="endText"></p>
+        <button type="button" class="primary" id="again">Chase again</button>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <p class="help">Space or tap during the ball. Gold is a boundary. The edges get you out.</p>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
