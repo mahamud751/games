@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Southline — Playhouse</title>
+  <meta name="description" content="Open-city crime sandbox in a neon beach town, 1986. Steal cars, run jobs for Sonny Reyes, and lose the heat.">
+  <meta name="theme-color" content="#120a1f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Rubik:ital,wght@0,400;0,500;0,700;0,800;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+</head>
+<body>
+  <canvas id="game" aria-label="Coral Bay"></canvas>
+  <div id="tint"></div>
+  <div id="fade"></div>
+  <div id="down"><h2 id="downTitle">Flatlined</h2><p id="downSub"></p></div>
+
+  <!-- loading -->
+  <section id="loading" class="screen show">
+    <div class="load-box">
+      <div class="logo"><span class="script">Southline</span><span class="sub">Coral Bay · 1986</span></div>
+      <div class="load-bar"><i id="loadFill"></i></div>
+      <p id="loadText">Loading…</p>
+    </div>
+  </section>
+
+  <!-- title -->
+  <section id="title" class="screen">
+    <div class="title-wrap">
+      <a class="hub" href="../" aria-label="Back to Playhouse"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Playhouse</a>
+      <div class="logo"><span class="script">Southline</span><span class="sub">Coral Bay · 1986</span></div>
+      <p class="lede">A neon beach town that never sleeps. Steal a ride, run jobs for Sonny Reyes, and keep one step ahead of the law.</p>
+      <nav class="menu-list">
+        <button id="btnContinue" type="button">Continue</button>
+        <button id="btnNew" type="button">New game</button>
+        <button type="button" data-panel="panelControls">Controls</button>
+        <button type="button" data-panel="panelSettings">Settings</button>
+      </nav>
+      <p class="save-line" id="saveLine"></p>
+    </div>
+    <aside class="panel" id="panelControls">
+      <button class="close" type="button" aria-label="Close">×</button>
+      <h3>Controls</h3>
+      <div class="keys">
+        <h4>On foot</h4>
+        <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</p>
+        <p><kbd>Mouse</kbd> Look</p>
+        <p><kbd>Shift</kbd> Sprint · <kbd>Space</kbd> Jump</p>
+        <p><kbd>Right mouse</kbd> Aim · <kbd>Left mouse</kbd> Fire / punch</p>
+        <p><kbd>Q</kbd><kbd>E</kbd> or wheel · <kbd>1</kbd>–<kbd>5</kbd> Weapons</p>
+        <p><kbd>F</kbd> Get in / steal a car</p>
+        <h4>Driving</h4>
+        <p><kbd>W</kbd> Gas · <kbd>S</kbd> Brake / reverse</p>
+        <p><kbd>A</kbd><kbd>D</kbd> Steer · <kbd>Space</kbd> Handbrake</p>
+        <p><kbd>R</kbd> Radio · <kbd>H</kbd> Horn · <kbd>F</kbd> Get out</p>
+        <p><kbd>J</kbd> Taxi or vigilante job (in a cab or cruiser)</p>
+        <h4>Anywhere</h4>
+        <p><kbd>M</kbd> Map · <kbd>Esc</kbd> Pause</p>
+      </div>
+    </aside>
+    <aside class="panel" id="panelSettings">
+      <button class="close" type="button" aria-label="Close">×</button>
+      <h3>Settings</h3>
+      <div class="settings">
+        <label>Graphics<select data-set="quality"><option value="high">High: shadows, bloom</option><option value="low">Performance</option></select></label>
+        <label>Mouse sensitivity<input type="range" min="0.3" max="2.5" step="0.1" data-set="sens"></label>
+        <label class="check"><input type="checkbox" data-set="invert"> Invert look</label>
+        <label>Radio volume<input type="range" min="0" max="1" step="0.05" data-set="music"></label>
+        <label>Effects volume<input type="range" min="0" max="1" step="0.05" data-set="sfx"></label>
+      </div>
+    </aside>
+  </section>
+
+  <!-- hud -->
+  <div id="hud" hidden>
+    <button id="hudPause" type="button" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="stack">
+      <div class="weapon"><span id="wIcon"></span><b id="ammo"></b></div>
+      <div class="col">
+        <div id="clock">19:00</div>
+        <div class="vitals">
+          <span class="hp"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3 4.6 4.6 0 0 1 8 3c0 5.8-8 11-8 11z"/></svg><b id="hp">100</b></span>
+          <span class="armor" id="armorRow" hidden><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><b id="armor">0</b></span>
+        </div>
+        <div id="cash">$00000000</div>
+        <div id="stars"></div>
+        <div id="timer" hidden><span id="timerLabel">Time</span><b id="timerVal">0:00</b></div>
+      </div>
+    </div>
+    <canvas id="radar" width="180" height="180"></canvas>
+    <div id="zone"></div>
+    <div id="vehicle"></div>
+    <div id="radioName"></div>
+    <div id="help" hidden></div>
+    <div id="objective" hidden></div>
+    <div id="subtitle" hidden></div>
+    <div id="big" hidden><h2 id="bigTitle"></h2><p id="bigSub"></p></div>
+    <div id="cross" hidden><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- touch -->
+  <div id="touch">
+    <div class="stick-zone"></div>
+    <div class="look-zone"></div>
+    <div class="base"></div><div class="knob"></div>
+    <div class="btns">
+      <button type="button" data-key="fire" class="big">Fire</button>
+      <button type="button" data-key="Space">Jump<br>Brake</button>
+      <button type="button" data-key="KeyF">Car</button>
+      <button type="button" data-key="KeyE">Weapon</button>
+      <button type="button" data-key="KeyR">Radio</button>
+      <button type="button" data-key="KeyJ">Job</button>
+    </div>
+  </div>
+
+  <!-- pause -->
+  <section id="pause" class="screen">
+    <div class="pause-card">
+      <header>
+        <div class="logo small"><span class="script">Southline</span></div>
+        <nav class="tabs">
+          <button type="button" data-tab="map" class="on">Map</button>
+          <button type="button" data-tab="stats">Stats</button>
+          <button type="button" data-tab="settings">Settings</button>
+          <button type="button" data-tab="controls">Controls</button>
+        </nav>
+      </header>
+      <div class="pane show" id="pane-map">
+        <canvas id="mapCanvas" width="900" height="900"></canvas>
+        <ul class="legend">
+          <li><i style="--c:#ff4fb3">S</i>Sonny, next story job</li>
+          <li><i style="--c:#21e6ff">H</i>Safehouse, saves the game</li>
+          <li><i style="--c:#ff8a1f">G</i>Bullet Bay guns</li>
+          <li><i style="--c:#ff5edb">P</i>Spray &amp; Go, clears your stars</li>
+          <li><i style="--c:#fff;color:#e23">+</i>Hospital</li>
+          <li><i style="--c:#3d8bff;color:#fff">P</i>Police</li>
+        </ul>
+      </div>
+      <div class="pane" id="pane-stats"><div id="statsList"></div></div>
+      <div class="pane" id="pane-settings">
+        <div class="settings">
+          <label>Graphics<select data-set="quality"><option value="high">High: shadows, bloom</option><option value="low">Performance</option></select></label>
+          <label>Mouse sensitivity<input type="range" min="0.3" max="2.5" step="0.1" data-set="sens"></label>
+          <label class="check"><input type="checkbox" data-set="invert"> Invert look</label>
+          <label>Radio volume<input type="range" min="0" max="1" step="0.05" data-set="music"></label>
+          <label>Effects volume<input type="range" min="0" max="1" step="0.05" data-set="sfx"></label>
+        </div>
+      </div>
+      <div class="pane" id="pane-controls">
+        <div class="keys two">
+          <div>
+            <h4>On foot</h4>
+            <p><kbd>WASD</kbd> Move · <kbd>Mouse</kbd> Look</p>
+            <p><kbd>Shift</kbd> Sprint · <kbd>Space</kbd> Jump</p>
+            <p><kbd>Right mouse</kbd> Aim · <kbd>Left mouse</kbd> Fire</p>
+            <p><kbd>Q</kbd><kbd>E</kbd> / wheel / <kbd>1</kbd>–<kbd>5</kbd> Weapons</p>
+            <p><kbd>F</kbd> Get in / steal a car</p>
+          </div>
+          <div>
+            <h4>Driving</h4>
+            <p><kbd>W</kbd><kbd>S</kbd> Gas, brake · <kbd>A</kbd><kbd>D</kbd> Steer</p>
+            <p><kbd>Space</kbd> Handbrake · <kbd>H</kbd> Horn</p>
+            <p><kbd>R</kbd> Radio · <kbd>F</kbd> Get out</p>
+            <p><kbd>J</kbd> Taxi / vigilante job · <kbd>G</kbd> Siren</p>
+            <p><kbd>M</kbd> Map · <kbd>Esc</kbd> Pause</p>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <button type="button" class="primary" id="resume">Resume</button>
+        <button type="button" id="toTitle">Save and quit to title</button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- gun shop -->
+  <section id="shop" class="screen">
+    <div class="shop-card">
+      <header><div><p class="kicker">Palm Heights</p><h3>Bullet Bay</h3></div><b id="shopCash">$0</b></header>
+      <div id="shopList"></div>
+      <button type="button" id="shopClose">Leave the shop</button>
+    </div>
+  </section>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
