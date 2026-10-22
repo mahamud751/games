@@ -225,12 +225,14 @@ kbd {
 
 /* ---------- shop ---------- */
 #shop { background: rgba(12, 6, 22, .6); backdrop-filter: blur(6px); }
-#shop.show { display: grid; place-items: center; }
+#shop.show, #panel.show { display: grid; place-items: center; }
+#panel { background: rgba(12, 6, 22, .55); backdrop-filter: blur(6px); }
+.panel-note { margin: -4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .shop-card { width: min(480px, 92vw); background: var(--glass-2); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: grid; gap: 14px; }
 .shop-card header { display: flex; justify-content: space-between; align-items: flex-end; }
 .shop-card .kicker { margin: 0 0 4px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
 .shop-card h3 { margin: 0; font: 400 40px/1 var(--script); color: #ffd7a8; text-shadow: 0 0 16px rgba(255, 138, 31, .8); }
-#shopCash { font: italic 900 24px/1 var(--ui); color: var(--money); text-shadow: var(--outline); }
+#shopCash, #panelCash { font: italic 900 24px/1 var(--ui); color: var(--money); text-shadow: var(--outline); }
 #shopList { display: grid; gap: 8px; }
 .item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(255, 255, 255, .05); border-radius: 12px; }
 .item small { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
@@ -253,6 +255,45 @@ kbd {
 }
 #touch .btns button.big { grid-column: 3; grid-row: 1 / span 2; width: 78px; height: 78px; background: rgba(255, 79, 179, .45); }
 #touch .btns button.on { background: rgba(255, 255, 255, .35); }
+
+#prompt {
+  position: absolute; left: 50%; bottom: max(150px, calc(env(safe-area-inset-bottom) + 132px)); transform: translateX(-50%);
+  padding: 9px 16px; border-radius: 999px; background: rgba(8, 4, 16, .72); border: 1px solid rgba(255, 255, 255, .16);
+  font: 700 15px/1.2 var(--ui); color: #fff; white-space: nowrap;
+}
+
+/* ---------- bar games ---------- */
+#mini { position: fixed; right: max(18px, 4vw); top: 50%; transform: translateY(-50%); z-index: 11; }
+.mini-card { width: min(340px, 90vw); padding: 18px; border-radius: 18px; background: rgba(20, 10, 34, .82); border: 1px solid var(--line); backdrop-filter: blur(10px); text-align: center; touch-action: none; }
+.mini-kicker { margin: 0; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+.mini-card h3 { margin: 4px 0 12px; font: 400 34px/1 var(--script); color: #ffd7a8; text-shadow: 0 0 14px rgba(255, 138, 31, .7); }
+#dartsCanvas { width: 100%; aspect-ratio: 1; display: block; }
+.arm-bar { display: flex; align-items: center; gap: 10px; font: 800 13px/1 var(--ui); }
+.arm-bar div { position: relative; flex: 1; height: 22px; border-radius: 11px; background: linear-gradient(90deg, #ff3b5c, #3a2a4a 50%, #3dff9e); }
+.arm-bar i { position: absolute; top: -6px; left: calc(var(--p, .5) * 100% - 6px); width: 12px; height: 34px; border-radius: 6px; background: #fff; box-shadow: 0 0 12px #fff; }
+#miniInfo { min-height: 22px; margin: 12px 0 0; font: 700 16px/1.3 var(--ui); }
+#miniInfo b { color: var(--gold); }
+.mini-hint { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+
+/* ---------- dance floor ---------- */
+#dance { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 11; width: min(380px, 92vw); text-align: center; pointer-events: none; }
+.dance-head { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin-bottom: 10px; }
+.dance-head span { font: 700 12px/1 var(--ui); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); text-shadow: var(--outline); }
+#danceScore { font: italic 900 34px/1 var(--ui); color: var(--money); text-shadow: var(--outline); }
+#danceCombo { font: italic 900 18px/1 var(--ui); color: var(--gold); text-shadow: var(--outline); font-style: italic; }
+.lanes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; height: min(380px, 48vh); }
+.lane { position: relative; overflow: hidden; border-radius: 14px; background: linear-gradient(180deg, rgba(20, 8, 34, .2), rgba(20, 8, 34, .7)); border: 1px solid rgba(255, 255, 255, .14); pointer-events: auto; touch-action: none; }
+.lane .target { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); width: 56px; height: 56px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .6); display: grid; place-items: center; font: 900 24px/1 var(--ui); color: rgba(255, 255, 255, .6); }
+.lane.hit .target { animation: tap .18s ease-out; }
+@keyframes tap { from { background: rgba(255, 255, 255, .45); transform: translateX(-50%) scale(1.15); } }
+.note { position: absolute; left: 50%; top: 0; margin-left: -26px; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font: normal 900 24px/1 var(--ui); color: #fff; box-shadow: 0 0 18px currentColor; }
+.note.n0 { background: #ff2fa0; } .note.n1 { background: #21b8ff; } .note.n2 { background: #3dff9e; color: #062; } .note.n3 { background: #ffb347; }
+.dance-progress { height: 4px; margin-top: 10px; border-radius: 2px; background: rgba(255, 255, 255, .15); overflow: hidden; }
+.dance-progress i { display: block; height: 100%; width: 0; background: var(--grad); }
+#danceJudge { margin: 12px 0 0; min-height: 30px; font: italic 900 26px/1 var(--ui); text-transform: uppercase; text-shadow: var(--outline); }
+#danceJudge.perfect { color: var(--cyan); } #danceJudge.good { color: var(--gold); } #danceJudge.miss { color: #ff5a6e; }
+#danceJudge.pop { animation: pop .25s ease-out; }
+.dance-hint { margin: 8px 0 0; font-size: 12px; color: #eadff2; text-shadow: var(--outline); }
 
 @media (max-width: 720px) {
   .stack { right: 10px; gap: 8px; }

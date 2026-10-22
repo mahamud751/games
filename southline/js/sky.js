@@ -94,6 +94,7 @@ export class Sky {
     scene.add(this.sun, this.sun.target);
     this.k = { top: new THREE.Color(), hor: new THREE.Color(), sun: new THREE.Color(), fog: new THREE.Color() };
     this.night = 0;
+    this.indoor = 1;
   }
   update(hour, focus, cam, t) {
     let a = KEYS[0], b = KEYS[1];
@@ -113,7 +114,7 @@ export class Sky {
     this.scene.fog.color.copy(k.fog); this.scene.fog.density = u.uFogD.value;
     this.hemi.color.copy(k.top).lerp(new THREE.Color(1, 1, 1), 0.55);
     this.hemi.groundColor.copy(k.hor).multiplyScalar(0.5);
-    this.hemi.intensity = hemi;
+    this.hemi.intensity = hemi * this.indoor;
     const light = dir.y > -0.02 ? dir : dir.clone().negate();
     this.sun.color.copy(k.sun);
     this.sun.intensity = sunI;

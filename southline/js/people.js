@@ -1,6 +1,6 @@
 // People on foot: civilians walking the block sidewalks or the beach, cops and
 // thugs who chase and shoot, ragdoll-ish knockdowns and bodies that fade out.
-import { buildPerson, personLook, animatePerson } from './models.js';
+import { buildPerson, personLook, animatePerson, posePerson } from './models.js';
 import { collideCircle, groundHeight, sidewalkCorner, blockRect, segmentClear, NX, NZ, BEACH_X, SHORE, CITY_H, PITCH, clamp } from './city.js';
 import { wrap } from './vehicles.js';
 
@@ -83,6 +83,7 @@ export class Person {
   update(dt, G) {
     if (this.removed) return;
     if (this.state === 'ride') return;
+    if (this.state === 'script' && this.pose) { this.sync(dt); return; }
     const P = G.target;
     let wantX = 0, wantZ = 0, speed = 0;
     if (this.state === 'fly') {
@@ -174,6 +175,7 @@ export class Person {
     const m = this.m;
     m.root.position.set(this.x, this.y, this.z);
     m.root.rotation.y = this.yaw;
+    if (this.pose && !this.dead) { this.phase += dt; posePerson(m, this.pose, this.phase * (this.tempo || 1), this.style || 0); return; }
     if (this.state === 'fly') {
       m.body.rotation.x = -this.tumble;
       return;

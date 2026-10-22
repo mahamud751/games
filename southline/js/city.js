@@ -31,7 +31,8 @@ export function blockRect(bx, bz) {
 const SPECIAL = {
   '6,2': 'club', '6,5': 'safehouse', '4,6': 'hospital', '1,4': 'hospital2', '2,4': 'police',
   '3,7': 'gunshop', '5,3': 'spray', '1,6': 'spray2', '3,1': 'bank', '4,2': 'showroom', '0,1': 'dock9',
-  '4,4': 'park', '1,8': 'park', '5,7': 'park'
+  '4,4': 'park', '1,8': 'park', '5,7': 'park',
+  '6,7': 'nightclub', '2,6': 'restaurant', '6,0': 'resort', '4,5': 'bar'
 };
 export function blockKind(bx, bz) {
   const s = SPECIAL[bx + ',' + bz];
@@ -74,7 +75,12 @@ export const PLACES = {
   spray2: { name: 'Spray & Go', ...front(1, 6, 'e') },
   bank: { name: 'Coral Federal', ...front(3, 1, 's') },
   showroom: { name: 'Sunrise Autos', ...front(4, 2, 'w', 12) },
-  dock9: { name: 'Dock 9', ...front(0, 1, 'e') }
+  dock9: { name: 'Dock 9', ...front(0, 1, 'e') },
+  nightclub: { name: 'Neon Palms', ...front(6, 7, 'e') },
+  bar: { name: 'The Driftwood', ...front(4, 5, 'w') },
+  restaurant: { name: 'Coral Grill', ...front(2, 6, 'n') },
+  resort: { name: 'Sunset Palms Resort', ...front(6, 0, 'e') },
+  tiki: { name: 'Tiki Shack', x: 574.5, z: 300, side: 'w' }
 };
 
 // ---------- ramps ----------
@@ -84,8 +90,14 @@ export const RAMPS = [
   { x: 326, z: 342, dx: 1, dz: 0, len: 9, w: 5, h: 2 }
 ];
 
+// Swimming pools in the venue interiors (far west of the island).
+export const POOLS = [];
 export function groundHeight(x, z) {
   if (x > SHORE) return -Math.min(2.1, (x - SHORE) * 2.1 / 40);
+  if (x < -500) {
+    for (const p of POOLS) if (x > p.x0 && x < p.x1 && z > p.z0 && z < p.z1) return -1.3;
+    return 0;
+  }
   for (const r of RAMPS) {
     const ux = x - r.x, uz = z - r.z;
     const u = ux * r.dx + uz * r.dz, v = ux * -r.dz + uz * r.dx;
@@ -125,7 +137,7 @@ const CELL = 20;
 const grid = new Map();
 export const solids = [];
 let stamp = 1;
-function addSolid(x0, z0, x1, z1, h, tag) {
+export function addSolid(x0, z0, x1, z1, h, tag) {
   const b = { x0, z0, x1, z1, h, tag, q: 0 };
   solids.push(b);
   for (let cx = Math.floor(x0 / CELL); cx <= Math.floor(x1 / CELL); cx++)
@@ -324,7 +336,7 @@ export function paintRadar(size) {
   return { canvas: c, x0, z0, span };
 }
 
-function signTexture(text, color, font = 'Kaushan Script') {
+export function signTexture(text, color, font = 'Kaushan Script') {
   const c = document.createElement('canvas');
   const g = c.getContext('2d');
   const px = 96;
@@ -401,7 +413,7 @@ function buildingMaterial(style) {
 }
 
 // ---------- palm geometry ----------
-function palmGeometries() {
+export function palmGeometries() {
   const trunk = new THREE.CylinderGeometry(0.16, 0.26, 1, 6, 6);
   trunk.translate(0, 0.5, 0);
   const p = trunk.attributes.position;
@@ -429,6 +441,33 @@ function palmGeometries() {
   crown.setAttribute('position', new THREE.Float32BufferAttribute(all, 3));
   crown.computeVertexNormals();
   return { trunk, crown };
+}
+
+// Instanced building boxes per window style; returns the meshes.
+export function buildingMeshes(scene, blds) {
+  const tmp = new THREE.Object3D(), col = new THREE.Color(), out = [];
+  for (const st of Object.keys(blds)) {
+    const list = blds[st];
+    if (!list.length) continue;
+    const geo = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
+    const top = new Float32Array(list.length), seed = new Float32Array(list.length);
+    const mesh = new THREE.InstancedMesh(geo, buildingMaterial(st), list.length);
+    list.forEach((b, i) => {
+      tmp.position.set((b.x0 + b.x1) / 2, 0, (b.z0 + b.z1) / 2);
+      tmp.scale.set(b.x1 - b.x0, b.h, b.z1 - b.z0);
+      tmp.updateMatrix();
+      mesh.setMatrixAt(i, tmp.matrix);
+      mesh.setColorAt(i, col.set(b.color));
+      top[i] = b.h; seed[i] = b.seed ?? Math.random();
+    });
+    geo.setAttribute('aTop', new THREE.InstancedBufferAttribute(top, 1));
+    geo.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seed, 1));
+    mesh.castShadow = mesh.receiveShadow = true;
+    mesh.frustumCulled = false;
+    scene.add(mesh);
+    out.push(mesh);
+  }
+  return out;
 }
 
 // ---------- the world ----------
@@ -563,9 +602,13 @@ export function buildCity(scene, quality) {
         spray2: ['plain', '#6b5f57', 7, '#ff2fa0', 'Spray & Go', '#ff5edb'],
         bank: ['glass', '#c9b98f', 62, '#ffd36b', 'Coral Federal', '#ffd36b'],
         showroom: ['glass', '#d9e4ec', 9, '#ff8a1f', 'Sunrise Autos', '#ffb347'],
-        dock9: ['plain', '#8a8f96', 12, '#3dff9e', 'Dock 9', '#3dff9e']
+        dock9: ['plain', '#8a8f96', 12, '#3dff9e', 'Dock 9', '#3dff9e'],
+        nightclub: ['deco', '#3a2050', 16, '#b04dff', 'Neon Palms', '#ff2fa0'],
+        bar: ['plain', '#6b4a33', 8, '#ff8a1f', 'Driftwood', '#ffb347'],
+        restaurant: ['plain', '#f2c46d', 9, '#ff8a1f', 'Coral Grill', '#ffb347'],
+        resort: ['deco', '#ffd3a5', 24, '#21e6ff', 'Sunset Palms', '#21e6ff']
       }[k];
-      building(L.x0, L.z0, L.x1, L.z1, spec[2], spec[0], spec[1], { trim: spec[3], corners: k === 'club' || k === 'safehouse' });
+      building(L.x0, L.z0, L.x1, L.z1, spec[2], spec[0], spec[1], { trim: spec[3], band: k === 'nightclub' ? '#21e6ff' : null, corners: k === 'club' || k === 'safehouse' || k === 'nightclub' || k === 'resort' });
       faceSign(L, side, spec[4], spec[5], Math.min(spec[2], 14), 20);
       if (k === 'showroom') for (let s = 0; s < 3; s++) parking.push({ x: blockRect(bx, bz).x0 + 10, z: blockRect(bx, bz).z0 + 14 + s * 14, yaw: Math.PI / 2, lot: 'showroom' });
     }
@@ -608,6 +651,19 @@ export function buildCity(scene, quality) {
     props.push([x - 0.6, 4.8, z - 0.6, 3.8, 0.25, 3.8, '#ff5d8f']);
     addSolid(x, z, x + 2.6, z + 2.6, 5, 'tower');
   }
+  // tiki shack on the beach
+  {
+    const tx = 578, tz = 300;
+    for (const [a, b] of [[0, -3], [4, -3], [0, 3], [4, 3]]) props.push([tx + a - 0.12, 0, tz + b - 0.12, 0.24, 3.2, 0.24, '#7a5634']);
+    props.push([tx - 0.6, 0, tz - 3, 1, 1.1, 6, '#9b6b3c']);
+    props.push([tx - 0.7, 1.1, tz - 3.1, 1.2, 0.08, 6.2, '#c9965a']);
+    props.push([tx + 3, 0, tz - 2.5, 0.5, 2.2, 5, '#6b4a2b']);
+    for (let k = 0; k < 6; k++) props.push([tx + 3.1, 1.6, tz - 2.2 + k * 0.85, 0.12, 0.35, 0.12, ['#ff5d8f', '#ffd23f', '#5fe08a', '#3dc6e0'][k % 4]]);
+    addSolid(tx - 0.6, tz - 3, tx + 3.5, tz + 3, 3, 'tiki');
+    umbrellas.push({ x: tx + 2, z: tz, col: '#c9a35a', big: true });
+    trims.push([tx - 0.7, 1.2, tz - 3.1, 0.1, 0.1, 6.2, '#ff2fa0']);
+    signs.push({ text: 'Tiki', col: '#ffb347', x: tx - 0.9, y: 1.85, z: tz, nx: -1, nz: 0, width: 2.6 });
+  }
   // sea walls
   const wall = (x0, z0, x1, z1) => { props.push([x0, -1.6, z0, x1 - x0, 2.5, z1 - z0, '#9c968a']); addSolid(x0, z0, x1, z1, 12, 'wall'); };
   wall(LAND.x0 - 1.2, LAND.z0 - 1.2, LAND.x0, LAND.z1 + 1.2);
@@ -617,26 +673,7 @@ export function buildCity(scene, quality) {
   // ---------- meshes ----------
   const box = new THREE.BoxGeometry(1, 1, 1).translate(0.5, 0.5, 0.5);
   const tmp = new THREE.Object3D(), col = new THREE.Color();
-  for (const st of Object.keys(blds)) {
-    const list = blds[st];
-    if (!list.length) continue;
-    const geo = new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
-    const top = new Float32Array(list.length), seed = new Float32Array(list.length);
-    const mesh = new THREE.InstancedMesh(geo, buildingMaterial(st), list.length);
-    list.forEach((b, i) => {
-      tmp.position.set((b.x0 + b.x1) / 2, 0, (b.z0 + b.z1) / 2);
-      tmp.scale.set(b.x1 - b.x0, b.h, b.z1 - b.z0);
-      tmp.updateMatrix();
-      mesh.setMatrixAt(i, tmp.matrix);
-      mesh.setColorAt(i, col.set(b.color));
-      top[i] = b.h; seed[i] = b.seed;
-    });
-    geo.setAttribute('aTop', new THREE.InstancedBufferAttribute(top, 1));
-    geo.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seed, 1));
-    mesh.castShadow = mesh.receiveShadow = true;
-    mesh.frustumCulled = false;
-    scene.add(mesh);
-  }
+  buildingMeshes(scene, blds);
 
   // lamp poles + arms go into the prop list
   for (const l of lamps) {
@@ -702,7 +739,7 @@ export function buildCity(scene, quality) {
   {
     const mesh = new THREE.InstancedMesh(new THREE.ConeGeometry(1.8, 0.7, 8), new THREE.MeshStandardMaterial({ roughness: 0.7 }), umbrellas.length);
     umbrellas.forEach((u, i) => {
-      tmp.position.set(u.x, 2.5, u.z); tmp.rotation.set(0, 0, 0); tmp.scale.set(1, 1, 1); tmp.updateMatrix();
+      tmp.position.set(u.x, u.big ? 3.6 : 2.5, u.z); tmp.rotation.set(0, 0, 0); tmp.scale.setScalar(u.big ? 2.6 : 1); tmp.updateMatrix();
       mesh.setMatrixAt(i, tmp.matrix); mesh.setColorAt(i, col.set(u.col));
     });
     mesh.castShadow = true;

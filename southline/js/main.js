@@ -13,6 +13,7 @@ import { Vehicle, collideCars, driveTraffic, driveCop, spawnTraffic, randomType,
 import { Person, walkerSpot } from './people.js';
 import { Player, WEAPONS } from './player.js';
 import { Missions, STORY_COUNT } from './missions.js';
+import { Venues } from './venues.js';
 import { buildHeli, HEAD_MAT, paint } from './models.js';
 
 const $ = s => document.querySelector(s);
@@ -25,7 +26,7 @@ const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
 // ---------- save ----------
 const KEY = 'southline.save.v2';
 const defaults = () => ({
-  cash: 250, story: 0, shells: [], has: {}, ammo: {}, armor: 0, hour: 19, started: false,
+  cash: 250, story: 0, shells: [], has: {}, ammo: {}, armor: 0, hour: 19, started: false, props: {},
   quality: matchMedia('(pointer: coarse)').matches ? 'low' : 'high', sens: 1, invert: false,
   stats: { kills: 0, cops: 0, wrecked: 0, fares: 0, stunts: 0, bestStunt: 0, busted: 0, wasted: 0, time: 0 }
 });
@@ -68,7 +69,7 @@ const G = {
   target: { x: 545, z: 260, vx: 0, vz: 0, onFoot: true, speed: 0 },
   mode: 'loading', paused: false, slow: 1, bustT: 0, copT: 0, copT2: 0, heliT: 0, hurtFlash: 0
 };
-let player, missions, sky, fx, city, headlight;
+let player, missions, venues, sky, fx, city, headlight;
 
 function persist() {
   if (player) { save.has = { ...player.has }; save.ammo = { ...player.ammo }; save.armor = Math.round(player.armor); }
@@ -145,6 +146,7 @@ G.hurtPlayer = n => {
   if (G.mode !== 'play' || n <= 0) return;
   const a = Math.min(player.armor, n);
   player.armor -= a; n -= a;
+  if (G.fed > 0) n *= 0.7;
   player.hp -= n;
   G.hurtFlash = Math.min(0.7, G.hurtFlash + 0.25 + n * 0.01);
   if (player.hp <= 0) goDown('wasted');
@@ -241,7 +243,7 @@ G.inView = (x, z) => {
 };
 const _p = new THREE.Vector3();
 G.blips = full => {
-  const out = missions.blips(full);
+  const out = missions.blips(full).concat(venues.blips());
   if (G.stars > 0) {
     const blink = Math.floor(G.now * 3) % 2 ? '#ff3b3b' : '#3d8bff';
     for (const c of G.cars) if (c.ai?.mode === 'cop' && !c.dead) out.push({ x: c.x, z: c.z, color: blink, size: 4 });
@@ -296,6 +298,45 @@ $('#shopList').addEventListener('click', e => {
 });
 $('#shopClose').addEventListener('click', closeShop);
 
+// generic venue menus (drinks, food, property office)
+let panelBuilder = null, panelItems = [];
+G.openPanel = builder => {
+  if (G.mode !== 'play') return;
+  panelBuilder = builder;
+  G.panelOpen = true; G.paused = true;
+  input.enabled = false; input.unlock();
+  renderPanel();
+  $('#panel').classList.add('show');
+};
+function renderPanel() {
+  const s = panelBuilder();
+  $('#panelKicker').textContent = s.kicker;
+  $('#panelTitle').textContent = s.title;
+  $('#panelNote').textContent = s.note || '';
+  $('#panelNote').hidden = !s.note;
+  $('#panelCash').textContent = money(save.cash);
+  panelItems = s.items;
+  $('#panelList').innerHTML = s.items.map((it, i) => `<div class="item"><div><b>${it.name}</b><small>${it.desc}</small></div><button data-i="${i}" ${it.off || save.cash < it.price ? 'disabled' : ''}>${it.label}${it.price ? ' · ' + money(it.price) : ''}</button></div>`).join('');
+}
+function closePanel() {
+  $('#panel').classList.remove('show');
+  G.panelOpen = false; G.paused = false; input.enabled = true;
+  lockPointer();
+}
+$('#panelList').addEventListener('click', e => {
+  const b = e.target.closest('[data-i]');
+  if (!b || b.disabled) return;
+  const it = panelItems[Number(b.dataset.i)];
+  if (save.cash < it.price) return;
+  if (it.act()) closePanel(); else renderPanel();
+});
+$('#panelClose').addEventListener('click', closePanel);
+addEventListener('keydown', e => {
+  if (e.code !== 'Escape') return;
+  if (G.panelOpen) closePanel();
+  else if (G.shopOpen) closeShop();
+});
+
 G.saveAtSafehouse = () => {
   if (G.stars > 0) { hud.help('You can’t lie low with cops on your tail.', 3000); return; }
   player.hp = 100;
@@ -321,6 +362,7 @@ G.sprayCar = () => {
     hud.banner('Fresh paint', cost ? 'Spray & Go · $100' : 'First one’s free', '#ff5edb', 2600);
   }, 450);
 };
+G.fade = t => fade(t);
 function fade(t) { const f = $('#fade'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), t * 1000 + 300); }
 
 // ---------- down: wasted / busted / drowned ----------
@@ -346,6 +388,7 @@ function respawn() {
   $('#down').className = '';
   let at = PLACES.police;
   if (kind !== 'busted') at = dist(PLACES.hospital, player) < dist(PLACES.hospital2, player) ? PLACES.hospital : PLACES.hospital2;
+  venues.reset();
   clearWorld(true);
   const off = at.side === 'e' ? [1.5, 0] : at.side === 'w' ? [-1.5, 0] : at.side === 'n' ? [0, -1.5] : [0, 1.5];
   player.place(at.x + off[0], at.z + off[1], Math.atan2(off[0], off[1]));
@@ -507,7 +550,7 @@ function populate(focus, dt) {
   for (const c of G.cars) {
     if (c === player?.car) continue;
     const d = dist(c, focus);
-    if (c === player?.lastCar && d < 300) continue;
+    if (c === player?.lastCar && (d < 300 || G.inside)) continue;
     if ((c.keep && !c.dead) || c.mission) continue;
     if (d > 210 || (c.dead && d > 90) || (c.sunk && c.flood > 8)) c.remove(G);
   }
@@ -618,6 +661,7 @@ function updateCamera(dt) {
   if (cam.snap) { camera.position.set(px, py, pz); cam.snap = false; }
   else camera.position.lerp(_fwd.set(px, py, pz), k);
   camera.lookAt(tx, ty, tz);
+  if (G.drunk > 0.02) { camera.rotateZ(Math.sin(G.now * 0.9) * 0.09 * G.drunk); camera.rotateX(Math.sin(G.now * 1.7) * 0.025 * G.drunk); }
   const fov = 62 + (P.car ? Math.min(14, P.car.speed * 0.28) : 0) - (P.aiming ? 8 : 0);
   if (Math.abs(camera.fov - fov) > 0.05) { camera.fov += (fov - camera.fov) * Math.min(1, dt * 4); camera.updateProjectionMatrix(); }
 }
@@ -670,16 +714,18 @@ function tick(dt) {
       else if (player.car?.t.taxi) missions.startSide('taxi');
       else if (player.car?.t.police) missions.startSide('vigilante');
     }
-    player.update(dt, G, input);
+    if (!G.activity) player.update(dt, G, input);
+    else player.sync(dt);
   } else if (G.mode === 'down') {
     G.downT += dt;
     if (G.downT > 1.6) G.slow = 1;
     if (G.downT > 4.2) respawn();
   }
   updateTarget();
-  worldStep(dt, G.target);
+  worldStep(dt, G.inside && venues.back ? venues.back : G.target);
   if (G.mode === 'play') { manageCops(dt); missions.update(dt); }
   else updateHeli(0);
+  venues.update(dt);
   if (G.mode === 'down') { player.m.root.position.set(player.x, player.y, player.z); }
   updateCamera(dt);
   envUpdate(dt);
@@ -700,7 +746,9 @@ function tick(dt) {
   hud.hurt(G.hurtFlash + (player.hp < 25 ? 0.12 + Math.sin(G.now * 6) * 0.06 : 0));
   hud.update(dt, G);
   zoneT -= dt;
-  if (zoneT <= 0) { zoneT = 0.5; hud.zone(zoneName(player.x, player.z)); }
+  if (zoneT <= 0) { zoneT = 0.5; hud.zone(G.inside ? venues.v[G.inside].name : zoneName(player.x, player.z)); }
+  const blur = G.drunk > 0.3 ? `blur(${((G.drunk - 0.3) * 2.2).toFixed(1)}px) saturate(${(1 + G.drunk * 0.6).toFixed(2)})` : '';
+  if (canvas.style.filter !== blur) canvas.style.filter = blur;
 }
 
 function envUpdate(dt) {
@@ -765,6 +813,8 @@ function openTitle() {
   $('#touch')?.classList.remove('show');
   if (player) { player.m.root.visible = false; if (player.car) { player.car.driver = null; player.car = null; } }
   missions?.clear();
+  venues?.reset();
+  G.drunk = 0; G.fed = 0; canvas.style.filter = '';
   G.setStars(0);
   clearWorld(false);
   Sound.radio(false); Sound.silenceLoops();
@@ -798,6 +848,8 @@ function startGame(fresh) {
   G.setStars(0); G.slow = 1; G.bustT = 0;
   G.mode = 'play';
   missions.reset();
+  venues.reset();
+  G.drunk = 0; G.fed = 0;
   showScreen(null);
   hud.show(true);
   input.enabled = true;
@@ -822,7 +874,7 @@ function resume() {
   showScreen(null);
   input.enabled = true;
   lockPointer();
-  if (player.car) Sound.radio(true);
+  if (player.car || G.inside) Sound.radio(true);
 }
 function showTab(tab) {
   for (const b of $$('#pause .tabs button')) b.classList.toggle('on', b.dataset.tab === tab);
@@ -832,6 +884,7 @@ function showTab(tab) {
     const st = save.stats, rows = [
       ['Story', `${save.story} / ${STORY_COUNT}`], ['Cash', money(save.cash)], ['Seashells', `${save.shells.length} / ${missions.shells.length}`],
       ['People down', st.kills], ['Cops down', st.cops], ['Cars wrecked', st.wrecked], ['Taxi fares', st.fares],
+      ['Properties', `${Object.values(save.props || {}).filter(p => p.owned).length} / 4`], ['Best dance score', (st.bestDance || 0).toLocaleString('en-US')],
       ['Stunt jumps', st.stunts], ['Best airtime', st.bestStunt + 's'], ['Times busted', st.busted], ['Times flatlined', st.wasted],
       ['Time on the island', `${Math.floor(st.time / 3600)}h ${Math.floor(st.time / 60) % 60}m`]
     ];
@@ -839,7 +892,7 @@ function showTab(tab) {
   }
   if (tab === 'settings') syncSettings();
 }
-input.onUnlock = () => { if (G.mode === 'play' && !G.paused && !G.shopOpen) openPause('map'); };
+input.onUnlock = () => { if (G.mode === 'play' && !G.paused && !G.shopOpen && !G.panelOpen) openPause('map'); };
 $$('#pause .tabs button').forEach(b => b.addEventListener('click', () => { Sound.ui(); showTab(b.dataset.tab); }));
 $('#resume').addEventListener('click', resume);
 $('#toTitle').addEventListener('click', () => { persist(); openTitle(); });
@@ -913,6 +966,8 @@ async function init() {
   player = new Player(G, save); G.player = player;
   player.m.root.visible = false;
   missions = new Missions(G); G.missions = missions;
+  G.sky = sky;
+  venues = new Venues(G); G.venues = venues;
   applyQuality();
   setLoad(0.85, 'Waiting for sunset…');
   await nextFrame();

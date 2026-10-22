@@ -57,6 +57,8 @@
         <p><kbd>A</kbd><kbd>D</kbd> Steer · <kbd>Space</kbd> Handbrake</p>
         <p><kbd>R</kbd> Radio · <kbd>H</kbd> Horn · <kbd>F</kbd> Get out</p>
         <p><kbd>J</kbd> Taxi or vigilante job (in a cab or cruiser)</p>
+        <h4>Going out</h4>
+        <p>Walk up to a venue door and press <kbd>F</kbd> to go inside. At a marker inside, press <kbd>F</kbd> to sit at the bar, dance, play darts, arm wrestle, eat or buy the place.</p>
         <h4>Anywhere</h4>
         <p><kbd>M</kbd> Map · <kbd>Esc</kbd> Pause</p>
       </div>
@@ -96,6 +98,7 @@
     <div id="radioName"></div>
     <div id="help" hidden></div>
     <div id="objective" hidden></div>
+    <div id="prompt" hidden></div>
     <div id="subtitle" hidden></div>
     <div id="big" hidden><h2 id="bigTitle"></h2><p id="bigSub"></p></div>
     <div id="cross" hidden><i></i><i></i><i></i><i></i></div>
@@ -137,6 +140,12 @@
           <li><i style="--c:#ff5edb">P</i>Spray &amp; Go, clears your stars</li>
           <li><i style="--c:#fff;color:#e23">+</i>Hospital</li>
           <li><i style="--c:#3d8bff;color:#fff">P</i>Police</li>
+          <li><i style="--c:#ff8a1f">B</i>The Driftwood bar</li>
+          <li><i style="--c:#c77dff">N</i>Neon Palms nightclub</li>
+          <li><i style="--c:#ffb347">F</i>Coral Grill restaurant</li>
+          <li><i style="--c:#21e6ff">R</i>Sunset Palms resort</li>
+          <li><i style="--c:#ffb347">T</i>Tiki Shack beach bar</li>
+          <li><i style="--c:#3dff9e">✓</i>A venue you own</li>
         </ul>
       </div>
       <div class="pane" id="pane-stats"><div id="statsList"></div></div>
@@ -184,6 +193,42 @@
       <button type="button" id="shopClose">Leave the shop</button>
     </div>
   </section>
+
+  <!-- venue menus -->
+  <section id="panel" class="screen">
+    <div class="shop-card">
+      <header><div><p class="kicker" id="panelKicker"></p><h3 id="panelTitle"></h3></div><b id="panelCash">$0</b></header>
+      <p class="panel-note" id="panelNote" hidden></p>
+      <div id="panelList"></div>
+      <button type="button" id="panelClose">Done</button>
+    </div>
+  </section>
+
+  <!-- dance floor -->
+  <div id="dance" hidden>
+    <div class="dance-head"><span>Tips</span><b id="danceScore">0</b><em id="danceCombo"></em></div>
+    <div class="lanes">
+      <div class="lane" data-lane="0"><span class="target">←</span></div>
+      <div class="lane" data-lane="1"><span class="target">↓</span></div>
+      <div class="lane" data-lane="2"><span class="target">↑</span></div>
+      <div class="lane" data-lane="3"><span class="target">→</span></div>
+    </div>
+    <div class="dance-progress"><i id="danceBar"></i></div>
+    <p id="danceJudge"></p>
+    <p class="dance-hint">Hit <kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>S</kbd><kbd>W</kbd><kbd>D</kbd> as arrows reach the line · <kbd>F</kbd> stop</p>
+  </div>
+
+  <!-- bar games -->
+  <div id="mini" hidden>
+    <div class="mini-card">
+      <p class="mini-kicker" id="miniKicker"></p>
+      <h3 id="miniTitle"></h3>
+      <canvas id="dartsCanvas" width="320" height="320"></canvas>
+      <div id="armBar" class="arm-bar"><span>Lou</span><div><i></i></div><span>You</span></div>
+      <p id="miniInfo"></p>
+      <p class="mini-hint" id="miniHint"></p>
+    </div>
+  </div>
 
   <script type="module" src="js/main.js"></script>
 </body>

@@ -166,6 +166,19 @@ export const Sound = {
     return STATIONS[station];
   },
   setStation(i) { station = i; },
+  // Music playing inside a venue (club sound system, restaurant, pool).
+  venue(i, level = 1) {
+    if (!ensure()) return;
+    if (i == null) {
+      if (this.saved != null) { station = this.saved; this.saved = null; }
+      setRadio(false);
+      return;
+    }
+    if (this.saved == null) this.saved = station;
+    station = i; step = 0; nextT = ac.currentTime + 0.1;
+    setRadio(true);
+    radioBus.gain.setTargetAtTime(level, ac.currentTime, 0.2);
+  },
   engine(on, speed, throttle, top) {
     if (!ac) return;
     if (!eng) eng = makeEngine();

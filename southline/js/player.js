@@ -1,7 +1,7 @@
 // The player on foot (move, sprint, jump, fight, shoot) and at the wheel
 // (enter, carjack, drive, horn, radio, bail out), plus shot hit-testing.
 import * as THREE from 'three';
-import { buildPerson, personLook, animatePerson } from './models.js';
+import { buildPerson, personLook, animatePerson, posePerson } from './models.js';
 import { collideCircle, groundHeight, rayWorld, SEA_Y, DEEP, clamp } from './city.js';
 import { Person } from './people.js';
 import { wrap } from './vehicles.js';
@@ -122,6 +122,7 @@ export class Player {
     const cy = G.cam.yaw, fx = Math.sin(cy), fz = Math.cos(cy), rx = -fz, rz = fx;
     const mx = I.moveX(), mz = I.moveY();
     let wx = fx * mz + rx * mx, wz = fz * mz + rz * mx;
+    if (G.drunk > 0.05 && (wx || wz)) { const a = Math.sin(G.now * 1.3) * 0.7 * G.drunk, c = Math.cos(a), s = Math.sin(a); [wx, wz] = [wx * c - wz * s, wx * s + wz * c]; }
     const len = Math.hypot(wx, wz);
     if (len > 1) { wx /= len; wz /= len; }
     const w = WEAPONS[this.weapon];
@@ -162,8 +163,8 @@ export class Player {
     if (this.x > DEEP) G.drown();
     // combat
     this.fireCd -= dt; this.aimHold -= dt; this.punchT -= dt;
-    if ((w.auto ? I.fire() : I.hit('Mouse0') || (I.fire() && w.melee)) && this.fireCd <= 0) this.fire(G);
-    if (I.hit('KeyF') || I.hit('Enter')) this.tryEnter(G);
+    if (!G.inside && (w.auto ? I.fire() : I.hit('Mouse0') || (I.fire() && w.melee)) && this.fireCd <= 0) this.fire(G);
+    if ((I.hit('KeyF') || I.hit('Enter')) && !G.venues?.nearDoor) this.tryEnter(G);
     this.sync(dt);
   }
   tryEnter(G) {
@@ -208,7 +209,7 @@ export class Player {
   drive(dt, G, I) {
     const c = this.car;
     c.ctrl.throttle = I.moveY();
-    c.ctrl.steer = I.steer();
+    c.ctrl.steer = I.steer() + (G.drunk > 0.05 ? Math.sin(G.now * 1.1) * 0.35 * G.drunk : 0);
     c.ctrl.hb = I.down('Space');
     if (I.hit('KeyH')) { G.audio.horn(); G.onHorn(c); }
     if (I.hit('KeyR')) G.nextStation();
@@ -292,6 +293,7 @@ export class Player {
     const m = this.m;
     m.root.position.set(this.x, this.y, this.z);
     m.root.rotation.y = this.yaw;
+    if (this.pose) { this.poseT = (this.poseT || 0) + dt; m.gun.visible = false; posePerson(m, this.pose, this.poseT, this.poseStyle || 0); return; }
     m.body.rotation.x = 0;
     const run = this.moving > 5;
     this.phase += dt * (run ? 11 : 7.5) * Math.min(1, this.moving / 1.5);

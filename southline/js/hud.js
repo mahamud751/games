@@ -21,7 +21,7 @@ export class HUD {
       root: $('#hud'), clock: $('#clock'), wIcon: $('#wIcon'), ammo: $('#ammo'), hp: $('#hp'), armor: $('#armor'), armorRow: $('#armorRow'),
       cash: $('#cash'), stars: $('#stars'), timer: $('#timer'), timerLabel: $('#timerLabel'), timerVal: $('#timerVal'),
       zone: $('#zone'), vehicle: $('#vehicle'), radio: $('#radioName'), help: $('#help'), sub: $('#subtitle'),
-      obj: $('#objective'), big: $('#big'), bigT: $('#bigTitle'), bigS: $('#bigSub'), cross: $('#cross'), tint: $('#tint')
+      obj: $('#objective'), prompt: $('#prompt'), big: $('#big'), bigT: $('#bigTitle'), bigS: $('#bigSub'), cross: $('#cross'), tint: $('#tint')
     };
     this.radarCanvas = $('#radar');
     this.rg = this.radarCanvas.getContext('2d');
@@ -55,6 +55,12 @@ export class HUD {
     this.el.sub.innerHTML = s.who ? `<b>${s.who}:</b> ${s.text}` : s.text;
     this.el.sub.hidden = false;
     this.subT = s.t || Math.max(2.6, s.text.length * 0.055);
+  }
+  prompt(html) {
+    if (this.last.prompt === html) return;
+    this.last.prompt = html;
+    this.el.prompt.innerHTML = html || '';
+    this.el.prompt.hidden = !html;
   }
   objective(text) { this.el.obj.innerHTML = text || ''; this.el.obj.hidden = !text; if (text) this.flash(this.el.obj, 'show', 400); }
   banner(title, sub, color = '#ffd36b', t = 4000) {
@@ -90,6 +96,7 @@ export class HUD {
     this.set('stars', G.stars * 10 + (flash ? 1 : 0), () => this.starEls.forEach((s, i) => { s.classList.toggle('on', i < G.stars && !flash); s.classList.toggle('dim', i < G.stars && flash); }));
     this.set('cross', P.onFoot && !WEAPONS[P.weapon].melee, v => { e.cross.hidden = !v; });
     e.cross.classList.toggle('aim', !!P.aiming);
+    this.radarCanvas.style.visibility = G.inside ? 'hidden' : 'visible';
     this.drawRadar(G);
   }
   // world -> radar pixels, rotated so the camera's forward is up

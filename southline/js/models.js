@@ -194,12 +194,49 @@ export function buildPerson(look) {
 // walk/run/aim pose
 export function animatePerson(m, phase, amount, aim, dead) {
   if (dead) return;
+  m.armL.rotation.z = m.armR.rotation.z = 0; m.torso.rotation.y = 0; m.body.rotation.x = 0;
   const s = Math.sin(phase) * amount;
   m.legL.rotation.x = s; m.legR.rotation.x = -s;
   m.armL.rotation.x = -s * 0.9;
   m.armR.rotation.x = aim ? -Math.PI / 2 : s * 0.9;
   m.torso.rotation.x = amount > 0.7 ? 0.12 : 0;
   m.body.position.y = Math.abs(Math.cos(phase)) * amount * 0.06;
+}
+
+// Venue poses: dancing on the beat, sitting at a table, lying on a lounger.
+export function posePerson(m, pose, t, style = 0) {
+  m.armL.rotation.z = m.armR.rotation.z = 0; m.torso.rotation.y = 0; m.body.rotation.x = 0; m.body.position.y = 0;
+  if (pose === 'dance') {
+    const b = Math.sin(t * 2 + style), w = Math.sin(t + style);
+    m.body.position.y = Math.abs(b) * 0.09;
+    m.legL.rotation.x = w * 0.4; m.legR.rotation.x = -w * 0.4;
+    const up = style % 2 ? 2.6 : 1.5;
+    m.armL.rotation.x = -up + Math.sin(t * 2 + style) * 0.8; m.armR.rotation.x = -up - Math.sin(t * 2 + style) * 0.8;
+    m.armL.rotation.z = 0.35; m.armR.rotation.z = -0.35;
+    m.torso.rotation.y = Math.sin(t + style * 1.7) * 0.45;
+  } else if (pose === 'sit') {
+    m.body.position.y = -0.42;
+    m.legL.rotation.x = m.legR.rotation.x = -Math.PI / 2;
+    m.armL.rotation.x = m.armR.rotation.x = -0.5 + Math.sin(t * 0.7 + style) * 0.15;
+  } else if (pose === 'sip' || pose === 'arm') {
+    m.body.position.y = -0.42;
+    m.legL.rotation.x = m.legR.rotation.x = -Math.PI / 2;
+    m.armL.rotation.x = -0.5;
+    if (pose === 'sip') m.armR.rotation.x = -1.0 - Math.max(0, Math.sin(t * 1.2)) * 1.5;
+    else { m.armR.rotation.x = -1.25; m.armR.rotation.z = style; m.torso.rotation.y = style * 0.3; }
+  } else if (pose === 'throw') {
+    m.legL.rotation.x = 0.25; m.legR.rotation.x = -0.15;
+    m.armL.rotation.x = -0.3;
+    m.armR.rotation.x = t < 0.25 ? -2.5 + t * 6 : -2.4 + Math.sin(t * 2) * 0.05;
+  } else if (pose === 'lie') {
+    m.body.rotation.x = -Math.PI / 2 + 0.25; m.body.position.y = 0.6;
+    m.legL.rotation.x = m.legR.rotation.x = 0;
+    m.armL.rotation.x = m.armR.rotation.x = -2.9;
+  } else {
+    m.legL.rotation.x = m.legR.rotation.x = 0;
+    m.armL.rotation.x = Math.sin(t * 0.8 + style) * 0.2 - 0.2; m.armR.rotation.x = -0.25;
+    m.body.position.y = 0;
+  }
 }
 
 // ---------- helicopter ----------
