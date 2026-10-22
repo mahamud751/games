@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Apex Pursuit</title>
+  <meta name="theme-color" content="#0b0c10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,600;1,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="fx-cops" class="fx-cops"></div>
+  <div id="fx-speed" class="fx-speed"></div>
+  <div id="fx-hit" class="fx-hit"></div>
+
+  <!-- loading -->
+  <section id="loading" class="screen show">
+    <div class="load-box">
+      <div class="logo big"><span class="l1">APEX</span><span class="l2">PURSUIT</span></div>
+      <div class="load-bar"><i id="loadFill"></i></div>
+      <p id="loadText">Warming up the engine…</p>
+    </div>
+  </section>
+
+  <!-- menu -->
+  <section id="menu" class="screen">
+    <header class="topbar">
+      <a class="hub" href="../" title="Back to Playhouse" aria-label="Back to Playhouse">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <div class="logo"><span class="l1">APEX</span><span class="l2">PURSUIT</span></div>
+      <nav class="tabs" role="tablist">
+        <button class="tab on" data-tab="play" role="tab">Play</button>
+        <button class="tab" data-tab="wanted" role="tab">Wanted List</button>
+        <button class="tab" data-tab="garage" role="tab">Garage</button>
+      </nav>
+      <div class="wallet">
+        <div class="stat"><span>Cash</span><b id="cash">$0</b></div>
+        <div class="stat"><span>Career bounty</span><b id="career">0</b></div>
+      </div>
+      <div class="icons">
+        <button class="ic" id="bMusic" title="Music" aria-label="Music"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
+        <button class="ic" id="bSfx" title="Sound" aria-label="Sound"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></button>
+        <button class="ic" id="bFull" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
+    </header>
+
+    <!-- play -->
+    <div class="pane show" id="pane-play">
+      <div class="hero">
+        <p class="kicker"><i class="dot"></i> Live pursuit · <span id="heroLoc">Coastline Highway</span></p>
+        <h1>Outrun the<br><em>city's finest.</em></h1>
+        <p class="lede">Build your bounty, take down the units on your tail, and disappear before the roadblocks close in.</p>
+        <div class="locs" id="locs"></div>
+        <div class="cta-row">
+          <button class="cta" id="startPursuit"><span>Start pursuit</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="ghost" data-tab-go="wanted">Wanted List</button>
+        </div>
+      </div>
+      <div class="plate" id="plate"></div>
+    </div>
+
+    <!-- wanted list -->
+    <div class="pane" id="pane-wanted">
+      <div class="side-panel wide">
+        <div class="panel-head">
+          <div><p class="kicker">Five names. One car each.</p><h2>The Wanted List</h2></div>
+          <p class="muted">Beat a racer to win their car. Pursuit bounty unlocks the next name.</p>
+        </div>
+        <div class="rivals" id="rivals"></div>
+      </div>
+    </div>
+
+    <!-- garage -->
+    <div class="pane" id="pane-garage">
+      <div class="side-panel">
+        <div class="panel-head"><div><p class="kicker">Your garage</p><h2 id="gName">Kestrel GT</h2></div><span class="cls" id="gCls">Street</span></div>
+        <div class="car-list" id="carList"></div>
+        <div class="stats" id="gStats"></div>
+        <div class="paint-head"><span>Paint</span><b id="paintName">Ember Orange</b></div>
+        <div class="paints" id="paints"></div>
+        <button class="cta full" id="gAction"><span>Selected</span></button>
+      </div>
+    </div>
+
+    <footer class="menu-foot">
+      <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> drive</span>
+      <span><kbd>Shift</kbd> nitro</span>
+      <span><kbd>Space</kbd> drift</span>
+      <span><kbd>C</kbd> camera</span>
+      <span><kbd>Esc</kbd> pause</span>
+      <button class="link" id="bQuality">Graphics: High</button>
+    </footer>
+  </section>
+
+  <!-- HUD -->
+  <section id="hud" class="screen">
+    <div class="hud-tl">
+      <div class="heat" id="heatBox">
+        <span class="lbl">Heat</span>
+        <div class="bars" id="heatBars"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="bounty"><span class="lbl" id="bountyLbl">Bounty</span><b id="bounty">0</b></div>
+      <div class="race-pos" id="racePos" hidden><span class="lbl">Position</span><b id="pos">1<small>st</small></b><span class="gap" id="gap">+0.0s</span></div>
+    </div>
+
+    <div class="hud-tc">
+      <div class="status" id="status"><i class="beacon"></i><span id="statusText">Cruising</span></div>
+      <div class="progress" id="progress" hidden>
+        <div class="track-line"><i class="fill" id="progFill"></i><i class="mk you" id="mkYou"></i><i class="mk riv" id="mkRiv"></i></div>
+        <div class="prog-labels"><span id="progLeft">0.0 km</span><span id="rivalName">vs Rook</span></div>
+      </div>
+    </div>
+
+    <div class="hud-tr">
+      <canvas id="minimap" width="360" height="360"></canvas>
+      <button class="ic pause-btn" id="bPause" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
+    </div>
+
+    <div class="meter" id="meter" hidden>
+      <div class="m-row"><span class="m-l">Busted</span><span class="m-c" id="meterText">Pursuit</span><span class="m-r">Evade</span></div>
+      <div class="m-bar"><i class="b" id="bustFill"></i><i class="e" id="evadeFill"></i></div>
+    </div>
+
+    <div class="speedo">
+      <svg viewBox="0 0 220 220" class="dial">
+        <defs>
+          <linearGradient id="rpmGrad" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stop-color="#ffb21f"/><stop offset=".7" stop-color="#ff5a1f"/><stop offset="1" stop-color="#ff1f4b"/>
+          </linearGradient>
+        </defs>
+        <circle cx="110" cy="110" r="92" class="ring-bg"/>
+        <circle cx="110" cy="110" r="92" class="ring" id="rpmArc" pathLength="100"/>
+        <g id="ticks"></g>
+      </svg>
+      <div class="speed-read">
+        <b id="speed">0</b><span>km/h</span>
+        <div class="gear"><span>Gear</span><b id="gear">N</b></div>
+      </div>
+      <div class="nitro"><span>N<sub>2</sub>O</span><div class="cells" id="nitroCells"></div></div>
+    </div>
+
+    <div class="feed" id="feed"></div>
+    <div class="alert" id="alert"><small id="alertKick"></small><b id="alertText"></b></div>
+    <div class="hint" id="hint"><kbd>Shift</kbd> nitro · <kbd>Space</kbd> drift · <kbd>C</kbd> camera · <kbd>R</kbd> reset</div>
+
+    <div class="touch" id="touch">
+      <div class="t-left">
+        <button data-k="left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button data-k="right" aria-label="Steer right"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="t-right">
+        <button data-k="drift" class="sm">Drift</button>
+        <button data-k="nitro" class="sm nos">N₂O</button>
+        <button data-k="brake">Brake</button>
+        <button data-k="gas" class="gas">Gas</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="count" class="count"><b id="countNum">3</b></div>
+
+  <!-- pause -->
+  <section id="pause" class="modal">
+    <div class="sheet">
+      <p class="kicker">Paused</p>
+      <h2>Catch your breath.</h2>
+      <div class="sheet-btns">
+        <button class="cta" id="pResume"><span>Resume</span></button>
+        <button class="ghost" id="pRestart">Restart</button>
+        <button class="ghost" id="pCam">Camera: Chase</button>
+        <button class="ghost" id="pQuit">Quit to menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- result -->
+  <section id="result" class="modal">
+    <div class="sheet result">
+      <p class="kicker" id="rKick">Pursuit over</p>
+      <h2 id="rTitle">Escaped</h2>
+      <p class="r-sub" id="rSub"></p>
+      <div class="r-prize" id="rPrize"></div>
+      <div class="r-stats" id="rStats"></div>
+      <div class="sheet-btns row">
+        <button class="cta" id="rAgain"><span>Run it back</span></button>
+        <button class="ghost" id="rMenu">Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
